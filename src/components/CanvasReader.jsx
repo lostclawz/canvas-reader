@@ -175,7 +175,13 @@ export const CanvasReader = ({
     if (!workerRef.current) return;
     workerRef.current.postMessage({
       type: MESSAGES.UPDATE,
-      ...fontProps,
+      font,
+      baseline,
+      align,
+      size,
+      lineHeight,
+      fillStyle,
+      strokeStyle,
     });
   }, [font, baseline, align, size, lineHeight, fillStyle, strokeStyle]);
 

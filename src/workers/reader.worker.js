@@ -104,7 +104,7 @@ const updateCanvas = () => {
     if (line === undefined) break;
     yPos = idx * lineHeight * size + offset;
     if (yPos >= -(lineHeight * size) && yPos < height) {
-      ctx.fillText(line, 0, yPos);
+      ctx.fillText(line, 0, yPos, width - 5);
     }
     if (yPos > height) {
       break;
