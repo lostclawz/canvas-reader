@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/hooks/useReaderAutoScroll.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#BookChooser">BookChooser</a></li><li><a href="global.html#CanvasReader">CanvasReader</a></li><li><a href="global.html#HOST">HOST</a></li><li><a href="global.html#LINE_BREAK">LINE_BREAK</a></li><li><a href="global.html#NODE_SERVER_PORT">NODE_SERVER_PORT</a></li><li><a href="global.html#PORT">PORT</a></li><li><a href="global.html#Reader">Reader</a></li><li><a href="global.html#Whether">Whether</a></li><li><a href="global.html#applyScrollDelta">applyScrollDelta</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#computeRatio">computeRatio</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#fillStyle">fillStyle</a></li><li><a href="global.html#firstTrue">firstTrue</a></li><li><a href="global.html#getCanvasHeight">getCanvasHeight</a></li><li><a href="global.html#getHeight">getHeight</a></li><li><a href="global.html#getScrollOffset">getScrollOffset</a></li><li><a href="global.html#getTextHeight">getTextHeight</a></li><li><a href="global.html#getWidth">getWidth</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleMouseDown">handleMouseDown</a></li><li><a href="global.html#handleMouseMove">handleMouseMove</a></li><li><a href="global.html#handleMouseUp">handleMouseUp</a></li><li><a href="global.html#height">height</a></li><li><a href="global.html#joinLines">joinLines</a></li><li><a href="global.html#lineHeight">lineHeight</a></li><li><a href="global.html#lineSpacer">lineSpacer</a></li><li><a href="global.html#lines">lines</a></li><li><a href="global.html#linesRaw">linesRaw</a></li><li><a href="global.html#measureFn">measureFn</a></li><li><a href="global.html#measureWordSet">measureWordSet</a></li><li><a href="global.html#memo">memo</a></li><li><a href="global.html#paragraphs">paragraphs</a></li><li><a href="global.html#quickStringSearch">quickStringSearch</a></li><li><a href="global.html#ratio">ratio</a></li><li><a href="global.html#rawContent">rawContent</a></li><li><a href="global.html#rebuildContent">rebuildContent</a></li><li><a href="global.html#reduceLines">reduceLines</a></li><li><a href="global.html#relativeMousePos">relativeMousePos</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#scrollBar">scrollBar</a></li><li><a href="global.html#searchText">searchText</a></li><li><a href="global.html#searcher">searcher</a></li><li><a href="global.html#setCanvasHeight">setCanvasHeight</a></li><li><a href="global.html#setCanvasWidth">setCanvasWidth</a></li><li><a href="global.html#setScrollOffset">setScrollOffset</a></li><li><a href="global.html#setTextHeight">setTextHeight</a></li><li><a href="global.html#setupScrollBar">setupScrollBar</a></li><li><a href="global.html#size">size</a></li><li><a href="global.html#splitLines">splitLines</a></li><li><a href="global.html#stopMouseEvents">stopMouseEvents</a></li><li><a href="global.html#textCenter">textCenter</a></li><li><a href="global.html#updateCanvas">updateCanvas</a></li><li><a href="global.html#updateFontProps">updateFontProps</a></li><li><a href="global.html#updateSearch">updateSearch</a></li><li><a href="global.html#useResizeObserver">useResizeObserver</a></li><li><a href="global.html#width">width</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/hooks/useReaderAutoScroll.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview React hook for automatic scrolling functionality in the canvas reader.
+ * Provides configurable auto-scroll with adjustable speed and amount.
+ */
+
+import { useEffect, useRef } from 'react';
+import { MESSAGES } from '../constants/constants';
+
+/**
+ * Auto-scroll configuration options.
+ * @typedef {Object} AutoScrollConfig
+ * @property {boolean} [enabled=true] - Whether auto-scrolling is enabled
+ * @property {number} [time=60] - Interval between scroll steps in milliseconds
+ * @property {number} [amount=2] - Number of pixels to scroll per interval
+ */
+
+/**
+ * Custom React hook that implements automatic scrolling for the canvas reader.
+ * Sends periodic scroll messages to the canvas worker at configured intervals.
+ * Automatically cleans up the interval when the component unmounts or when dependencies change.
+ *
+ * @param {Worker} canvasWorker - Web Worker instance for the canvas reader
+ * @param {AutoScrollConfig} [config] - Auto-scroll configuration options
+ * @param {boolean} [config.enabled=true] - Whether auto-scrolling is enabled
+ * @param {number} [config.time=60] - Interval between scroll steps in milliseconds (lower = faster)
+ * @param {number} [config.amount=2] - Number of pixels to scroll per interval (higher = faster)
+ * @returns {null} This hook has no return value (side-effects only)
+ *
+ * @example
+ * // Basic usage with defaults (enabled, 60ms interval, 2px per step)
+ * useReaderAutoScroll(worker);
+ *
+ * @example
+ * // Custom configuration for faster scrolling
+ * useReaderAutoScroll(worker, {
+ *   enabled: true,
+ *   time: 30,    // Faster interval
+ *   amount: 5    // Larger scroll amount
+ * });
+ *
+ * @example
+ * // Controlled by state
+ * const [autoScroll, setAutoScroll] = useState(false);
+ * useReaderAutoScroll(worker, {
+ *   enabled: autoScroll,
+ *   time: 100,
+ *   amount: 3
+ * });
+ */
+export default function useReaderAutoScroll(
+  canvasWorker,
+  { enabled, time, amount } = {
+    enabled: true,
+    time: 60,
+    amount: 2,
+  }
+) {
+  const scrollInterval = useRef(null);
+  useEffect(() => {
+    if (canvasWorker &amp;&amp; enabled) {
+      if (scrollInterval.current) {
+        clearTimeout(scrollInterval.current);
+      }
+      scrollInterval.current = setInterval(() => {
+        if (!canvasWorker) {
+          return;
+        }
+        canvasWorker.postMessage({
+          type: MESSAGES.SCROLL,
+          scrollDelta: amount,
+        });
+      }, time);
+    }
+    return () => {
+      if (scrollInterval.current) {
+        clearInterval(scrollInterval.current);
+      }
+    };
+  }, [canvasWorker, enabled, time, amount]);
+  return null;
+}
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/utils/utils.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#BookChooser">BookChooser</a></li><li><a href="global.html#CanvasReader">CanvasReader</a></li><li><a href="global.html#HOST">HOST</a></li><li><a href="global.html#LINE_BREAK">LINE_BREAK</a></li><li><a href="global.html#NODE_SERVER_PORT">NODE_SERVER_PORT</a></li><li><a href="global.html#PORT">PORT</a></li><li><a href="global.html#Reader">Reader</a></li><li><a href="global.html#Whether">Whether</a></li><li><a href="global.html#applyScrollDelta">applyScrollDelta</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#computeRatio">computeRatio</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#fillStyle">fillStyle</a></li><li><a href="global.html#firstTrue">firstTrue</a></li><li><a href="global.html#getCanvasHeight">getCanvasHeight</a></li><li><a href="global.html#getHeight">getHeight</a></li><li><a href="global.html#getScrollOffset">getScrollOffset</a></li><li><a href="global.html#getTextHeight">getTextHeight</a></li><li><a href="global.html#getWidth">getWidth</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleMouseDown">handleMouseDown</a></li><li><a href="global.html#handleMouseMove">handleMouseMove</a></li><li><a href="global.html#handleMouseUp">handleMouseUp</a></li><li><a href="global.html#height">height</a></li><li><a href="global.html#joinLines">joinLines</a></li><li><a href="global.html#lineHeight">lineHeight</a></li><li><a href="global.html#lineSpacer">lineSpacer</a></li><li><a href="global.html#lines">lines</a></li><li><a href="global.html#linesRaw">linesRaw</a></li><li><a href="global.html#measureFn">measureFn</a></li><li><a href="global.html#measureWordSet">measureWordSet</a></li><li><a href="global.html#memo">memo</a></li><li><a href="global.html#paragraphs">paragraphs</a></li><li><a href="global.html#quickStringSearch">quickStringSearch</a></li><li><a href="global.html#ratio">ratio</a></li><li><a href="global.html#rawContent">rawContent</a></li><li><a href="global.html#rebuildContent">rebuildContent</a></li><li><a href="global.html#reduceLines">reduceLines</a></li><li><a href="global.html#relativeMousePos">relativeMousePos</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#scrollBar">scrollBar</a></li><li><a href="global.html#searchText">searchText</a></li><li><a href="global.html#searcher">searcher</a></li><li><a href="global.html#setCanvasHeight">setCanvasHeight</a></li><li><a href="global.html#setCanvasWidth">setCanvasWidth</a></li><li><a href="global.html#setScrollOffset">setScrollOffset</a></li><li><a href="global.html#setTextHeight">setTextHeight</a></li><li><a href="global.html#setupScrollBar">setupScrollBar</a></li><li><a href="global.html#size">size</a></li><li><a href="global.html#splitLines">splitLines</a></li><li><a href="global.html#stopMouseEvents">stopMouseEvents</a></li><li><a href="global.html#textCenter">textCenter</a></li><li><a href="global.html#updateCanvas">updateCanvas</a></li><li><a href="global.html#updateFontProps">updateFontProps</a></li><li><a href="global.html#updateSearch">updateSearch</a></li><li><a href="global.html#useResizeObserver">useResizeObserver</a></li><li><a href="global.html#width">width</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/utils/utils.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview General utility functions for the canvas reader application.
+ * Includes helpers for conditional logic, canvas scaling, mouse positioning, and resize observation.
+ */
+
+import { useEffect, useRef, useState } from 'react';
+
+/**
+ * Returns the value associated with the first truthy condition in an array of condition-value pairs.
+ * This is a curried function that first takes a default value, then accepts an array of pairs.
+ *
+ * @param {*} defaultValue - The value to return if no condition is truthy
+ * @returns {Function} A function that takes pairs and returns the first matching value
+ *
+ * @example
+ * const getValue = firstTrue('default');
+ * getValue([[false, 'a'], [true, 'b'], [true, 'c']]); // returns 'b'
+ * getValue([[false, 'a'], [false, 'b']]); // returns 'default'
+ */
+export const firstTrue = (defaultValue) => (pairs) => {
+  for (let i = 0; i &lt; pairs.length; i++) {
+    if (pairs[i][0]) return pairs[i][1];
+  }
+  return defaultValue;
+};
+
+/**
+ * Computes the device pixel ratio for high-DPI displays.
+ * Used to properly scale canvas elements on retina and high-resolution displays.
+ *
+ * @param {HTMLCanvasElement} [_canvas] - Unused parameter (kept for backwards compatibility)
+ * @returns {number} The device pixel ratio (typically 1, 2, or 3)
+ *
+ * @example
+ * const ratio = computeRatio(); // returns 2 on retina displays, 1 on standard displays
+ */
+export const computeRatio = (_canvas) => {
+  const dpr = window.devicePixelRatio || 1;
+  const backingStore = 1;
+  return dpr / backingStore;
+};
+
+/**
+ * Calculates the mouse position relative to the target element's bounding box.
+ * Useful for determining click positions within a canvas or other element.
+ *
+ * @param {MouseEvent} e - The mouse event object
+ * @returns {{x: number, y: number}} The relative mouse coordinates
+ *
+ * @example
+ * element.addEventListener('click', (e) => {
+ *   const pos = relativeMousePos(e);
+ *   console.log(`Clicked at ${pos.x}, ${pos.y}`);
+ * });
+ */
+export const relativeMousePos = (e) => {
+  const rect = e.target.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top,
+  };
+};
+
+/**
+ * React hook that observes an element's size changes using the ResizeObserver API.
+ * Returns a ref to attach to the element and its current width and height.
+ *
+ * @returns {Array} An array containing [ref, width, height]:
+ *   ref (React.RefObject) - React ref to attach to the element to observe,
+ *   width (number) - Current width of the element in pixels,
+ *   height (number) - Current height of the element in pixels
+ *
+ * @example
+ * function MyComponent() {
+ *   const [ref, width, height] = useResizeObserver();
+ *   return (
+ *     &lt;div ref={ref}>
+ *       Size: {width} x {height}
+ *     &lt;/div>
+ *   );
+ * }
+ */
+export const useResizeObserver = () => {
+  const ref = useRef(null);
+  const [size, setSize] = useState({ width: 0, height: 0 });
+  useEffect(() => {
+    if (!ref.current) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setSize({ width, height });
+      }
+    });
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, size.width, size.height];
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

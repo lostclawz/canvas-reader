@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/components/ReaderNoStyle.jsx - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#BookChooser">BookChooser</a></li><li><a href="global.html#CanvasReader">CanvasReader</a></li><li><a href="global.html#HOST">HOST</a></li><li><a href="global.html#LINE_BREAK">LINE_BREAK</a></li><li><a href="global.html#NODE_SERVER_PORT">NODE_SERVER_PORT</a></li><li><a href="global.html#PORT">PORT</a></li><li><a href="global.html#Reader">Reader</a></li><li><a href="global.html#Whether">Whether</a></li><li><a href="global.html#applyScrollDelta">applyScrollDelta</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#computeRatio">computeRatio</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#fillStyle">fillStyle</a></li><li><a href="global.html#firstTrue">firstTrue</a></li><li><a href="global.html#getCanvasHeight">getCanvasHeight</a></li><li><a href="global.html#getHeight">getHeight</a></li><li><a href="global.html#getScrollOffset">getScrollOffset</a></li><li><a href="global.html#getTextHeight">getTextHeight</a></li><li><a href="global.html#getWidth">getWidth</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleMouseDown">handleMouseDown</a></li><li><a href="global.html#handleMouseMove">handleMouseMove</a></li><li><a href="global.html#handleMouseUp">handleMouseUp</a></li><li><a href="global.html#height">height</a></li><li><a href="global.html#joinLines">joinLines</a></li><li><a href="global.html#lineHeight">lineHeight</a></li><li><a href="global.html#lineSpacer">lineSpacer</a></li><li><a href="global.html#lines">lines</a></li><li><a href="global.html#linesRaw">linesRaw</a></li><li><a href="global.html#measureFn">measureFn</a></li><li><a href="global.html#measureWordSet">measureWordSet</a></li><li><a href="global.html#memo">memo</a></li><li><a href="global.html#paragraphs">paragraphs</a></li><li><a href="global.html#quickStringSearch">quickStringSearch</a></li><li><a href="global.html#ratio">ratio</a></li><li><a href="global.html#rawContent">rawContent</a></li><li><a href="global.html#rebuildContent">rebuildContent</a></li><li><a href="global.html#reduceLines">reduceLines</a></li><li><a href="global.html#relativeMousePos">relativeMousePos</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#scrollBar">scrollBar</a></li><li><a href="global.html#searchText">searchText</a></li><li><a href="global.html#searcher">searcher</a></li><li><a href="global.html#setCanvasHeight">setCanvasHeight</a></li><li><a href="global.html#setCanvasWidth">setCanvasWidth</a></li><li><a href="global.html#setScrollOffset">setScrollOffset</a></li><li><a href="global.html#setTextHeight">setTextHeight</a></li><li><a href="global.html#setupScrollBar">setupScrollBar</a></li><li><a href="global.html#size">size</a></li><li><a href="global.html#splitLines">splitLines</a></li><li><a href="global.html#stopMouseEvents">stopMouseEvents</a></li><li><a href="global.html#textCenter">textCenter</a></li><li><a href="global.html#updateCanvas">updateCanvas</a></li><li><a href="global.html#updateFontProps">updateFontProps</a></li><li><a href="global.html#updateSearch">updateSearch</a></li><li><a href="global.html#useResizeObserver">useResizeObserver</a></li><li><a href="global.html#width">width</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/components/ReaderNoStyle.jsx</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Top-level reader component that combines book selection and canvas rendering.
+ * Provides a complete reading interface with book chooser, search input, and canvas reader.
+ */
+
+import React, { memo, useState } from 'react';
+import BookChooser from './BookChooser.jsx';
+import CanvasReader from './CanvasReader.jsx';
+import { HOST, NODE_SERVER_PORT } from '../constants/constants';
+
+/**
+ * Reader component props.
+ * @typedef {Object} ReaderProps
+ * @property {number} [size=800] - Canvas dimensions (width and height in pixels)
+ * @property {number} [fontSize=15] - Default font size for text rendering
+ */
+
+/**
+ * Main reader component that orchestrates the reading experience.
+ * Combines a BookChooser for selecting books, a search input for finding text,
+ * and a CanvasReader for rendering the book content. Manages state for the
+ * currently selected book and search query.
+ *
+ * The component is memoized to prevent unnecessary re-renders.
+ *
+ * @param {ReaderProps} props - Component configuration props
+ * @returns {React.ReactElement} Complete reader interface with book selection and rendering
+ *
+ * @example
+ * // Default configuration (800x800 canvas, 15px font)
+ * &lt;Reader />
+ *
+ * @example
+ * // Custom size and font
+ * &lt;Reader size={1000} fontSize={18} />
+ */
+const Reader = memo(({ size = 800, fontSize = 15 }) => {
+  const [book, setBook] = useState(null);
+  const [searchText, setSearchText] = useState('');
+  const route = book
+    ? `http://${HOST}:${NODE_SERVER_PORT}/books/?file=${book}`
+    : '';
+  return (
+    &lt;div className="reader">
+      &lt;div>
+        &lt;BookChooser onSelect={setBook} />
+        &lt;div style={{ marginTop: 12 }}>
+          &lt;input
+            type="text"
+            placeholder="Search text..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
+        &lt;/div>
+      &lt;/div>
+      &lt;CanvasReader
+        key={route}
+        route={route}
+        canvasWidth={size}
+        canvasHeight={size}
+        size={fontSize}
+        searchText={searchText}
+      />
+    &lt;/div>
+  );
+});
+
+export default Reader;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

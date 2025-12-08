@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#BookChooser">BookChooser</a></li><li><a href="global.html#CanvasReader">CanvasReader</a></li><li><a href="global.html#HOST">HOST</a></li><li><a href="global.html#LINE_BREAK">LINE_BREAK</a></li><li><a href="global.html#NODE_SERVER_PORT">NODE_SERVER_PORT</a></li><li><a href="global.html#PORT">PORT</a></li><li><a href="global.html#Reader">Reader</a></li><li><a href="global.html#Whether">Whether</a></li><li><a href="global.html#applyScrollDelta">applyScrollDelta</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#computeRatio">computeRatio</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#fillStyle">fillStyle</a></li><li><a href="global.html#firstTrue">firstTrue</a></li><li><a href="global.html#getCanvasHeight">getCanvasHeight</a></li><li><a href="global.html#getHeight">getHeight</a></li><li><a href="global.html#getScrollOffset">getScrollOffset</a></li><li><a href="global.html#getTextHeight">getTextHeight</a></li><li><a href="global.html#getWidth">getWidth</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleMouseDown">handleMouseDown</a></li><li><a href="global.html#handleMouseMove">handleMouseMove</a></li><li><a href="global.html#handleMouseUp">handleMouseUp</a></li><li><a href="global.html#height">height</a></li><li><a href="global.html#joinLines">joinLines</a></li><li><a href="global.html#lineHeight">lineHeight</a></li><li><a href="global.html#lineSpacer">lineSpacer</a></li><li><a href="global.html#lines">lines</a></li><li><a href="global.html#linesRaw">linesRaw</a></li><li><a href="global.html#measureFn">measureFn</a></li><li><a href="global.html#measureWordSet">measureWordSet</a></li><li><a href="global.html#memo">memo</a></li><li><a href="global.html#paragraphs">paragraphs</a></li><li><a href="global.html#quickStringSearch">quickStringSearch</a></li><li><a href="global.html#ratio">ratio</a></li><li><a href="global.html#rawContent">rawContent</a></li><li><a href="global.html#rebuildContent">rebuildContent</a></li><li><a href="global.html#reduceLines">reduceLines</a></li><li><a href="global.html#relativeMousePos">relativeMousePos</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#scrollBar">scrollBar</a></li><li><a href="global.html#searchText">searchText</a></li><li><a href="global.html#searcher">searcher</a></li><li><a href="global.html#setCanvasHeight">setCanvasHeight</a></li><li><a href="global.html#setCanvasWidth">setCanvasWidth</a></li><li><a href="global.html#setScrollOffset">setScrollOffset</a></li><li><a href="global.html#setTextHeight">setTextHeight</a></li><li><a href="global.html#setupScrollBar">setupScrollBar</a></li><li><a href="global.html#size">size</a></li><li><a href="global.html#splitLines">splitLines</a></li><li><a href="global.html#stopMouseEvents">stopMouseEvents</a></li><li><a href="global.html#textCenter">textCenter</a></li><li><a href="global.html#updateCanvas">updateCanvas</a></li><li><a href="global.html#updateFontProps">updateFontProps</a></li><li><a href="global.html#updateSearch">updateSearch</a></li><li><a href="global.html#useResizeObserver">useResizeObserver</a></li><li><a href="global.html#width">width</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+    <section class="package">
+        <h3> </h3>		
+    </section>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+    <section class="readme usertext">
+        <article><h1>Canvas Reader</h1>
+<p>A React-based text reader application that renders books on an HTML canvas with search functionality.</p>
+<h2>Features</h2>
+<ul>
+<li>Fetches books from Gutendex API</li>
+<li>Renders text on canvas with customizable font settings</li>
+<li>Search functionality</li>
+<li>Auto-scroll capability</li>
+<li>Custom scrollbar implementation</li>
+</ul>
+<h2>Project Structure</h2>
+<pre class="prettyprint source"><code>canvas-reader/
+├── src/
+│   ├── components/       # React components
+│   ├── constants/        # Constants and configuration
+│   ├── hooks/            # Custom React hooks
+│   ├── utils/            # Utility functions
+│   ├── workers/          # Web workers
+│   ├── styles/           # CSS files
+│   └── main.jsx          # Application entry point
+├── tests/                # Test files
+├── server.js             # Express proxy server
+└── index.html            # Entry HTML
+</code></pre>
+<h2>Getting Started</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>Node.js (v14 or higher)</li>
+<li>npm</li>
+</ul>
+<h3>Installation</h3>
+<pre class="prettyprint source lang-bash"><code>npm install
+</code></pre>
+<h3>Running the Application</h3>
+<p>You need to run <strong>two</strong> processes:</p>
+<ol>
+<li>
+<p><strong>Start the Express proxy server</strong> (handles CORS for book text fetching):</p>
+<pre class="prettyprint source lang-bash"><code>npm run server
+</code></pre>
+<p>Server will run on http://localhost:3001</p>
+</li>
+<li>
+<p><strong>Start the Vite dev server</strong> (in a new terminal):</p>
+<pre class="prettyprint source lang-bash"><code>npm run dev
+</code></pre>
+<p>Application will run on http://localhost:5173</p>
+</li>
+</ol>
+<p>Then open http://localhost:5173 in your browser.</p>
+<h3>Why Two Servers?</h3>
+<p>The Express server acts as a proxy to fetch book content from external sources without CORS issues. The Vite dev server serves the React application.</p>
+<h2>Available Scripts</h2>
+<h3>Development</h3>
+<ul>
+<li><code>npm run dev</code> - Start Vite development server</li>
+<li><code>npm run server</code> - Start Express proxy server</li>
+</ul>
+<h3>Building</h3>
+<ul>
+<li><code>npm run build</code> - Build for production</li>
+<li><code>npm run preview</code> - Preview production build</li>
+</ul>
+<h3>Testing</h3>
+<ul>
+<li><code>npm test</code> - Run tests</li>
+<li><code>npm run test:coverage</code> - Run tests with coverage report</li>
+</ul>
+<h3>Code Quality</h3>
+<ul>
+<li><code>npm run lint</code> - Check code with Biome linter</li>
+<li><code>npm run lint:fix</code> - Fix linting issues automatically</li>
+<li><code>npm run format</code> - Format code with Biome</li>
+</ul>
+<h2>Development</h2>
+<p>The application uses:</p>
+<ul>
+<li><strong>Vite</strong> for fast development and building</li>
+<li><strong>React 18</strong> for the UI</li>
+<li><strong>Express</strong> for the proxy server</li>
+<li><strong>Web Workers</strong> for text processing</li>
+<li><strong>Mocha/Chai/Sinon</strong> for testing</li>
+<li><strong>Supertest</strong> for API testing</li>
+<li><strong>nyc</strong> for test coverage</li>
+<li><strong>Biome</strong> for linting and formatting</li>
+</ul>
+<h2>How It Works</h2>
+<ol>
+<li>Express server fetches the book list from Gutendex API</li>
+<li>User selects a book from the list</li>
+<li>The book's text URL is sent to the local Express server</li>
+<li>Express server fetches the text and returns it (avoiding CORS)</li>
+<li>The text is processed by a Web Worker</li>
+<li>Text is rendered on an HTML canvas with a custom scrollbar</li>
+<li>Users can search and scroll through the text</li>
+</ol>
+<h2>API Endpoints</h2>
+<p>The Express server provides the following endpoints:</p>
+<ul>
+<li><code>GET /api/books</code> - Fetch list of books from Gutendex API</li>
+<li><code>GET /api/book-text?url=&lt;encoded-url&gt;</code> - Proxy book text content</li>
+<li><code>GET /health</code> - Health check endpoint</li>
+</ul>
+<h2>Code Quality</h2>
+<h3>Testing</h3>
+<p>The project has comprehensive test coverage including:</p>
+<p><strong>Frontend Tests</strong> (90 tests):</p>
+<ul>
+<li>Component tests (React components)</li>
+<li>Hook tests (custom React hooks)</li>
+<li>Utility function tests</li>
+<li>Worker tests</li>
+<li>Constants tests</li>
+</ul>
+<p><strong>Backend Tests</strong> (27 tests):</p>
+<ul>
+<li>API endpoint tests (using Supertest)</li>
+<li>Error handling tests</li>
+<li>CORS configuration tests</li>
+<li>Edge case tests</li>
+</ul>
+<p><strong>Total: 117 tests passing</strong></p>
+<h4>Test Coverage</h4>
+<p>The project uses <strong>nyc</strong> for test coverage. Coverage thresholds are set to 80% for:</p>
+<ul>
+<li>Lines</li>
+<li>Statements</li>
+<li>Functions</li>
+<li>Branches</li>
+</ul>
+<p>Run <code>npm run test:coverage</code> to generate a coverage report. HTML reports are available in the <code>coverage/</code> directory.</p>
+<h3>Linting and Formatting</h3>
+<p>The project uses <strong>Biome</strong> for fast linting and formatting:</p>
+<ul>
+<li>Modern, fast alternative to ESLint + Prettier</li>
+<li>Configured for React/JSX</li>
+<li>Automatic import organization</li>
+<li>Consistent code style</li>
+</ul>
+<p>Configuration is in <a href="biome.json">biome.json</a>.</p></article>
+    </section>
+
+
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            server.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Express server for the canvas reader application.
+Provides API endpoints to fetch book lists and book content from external sources.
+Acts as a proxy server to handle CORS restrictions when accessing book data.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="server.js.html">server.js</a>, <a href="server.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Express server for the canvas reader application.
+Provides API endpoints to fetch book lists and book content from external sources.
+Acts as a proxy server to handle CORS restrictions when accessing book data.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/components/BookChooser.jsx
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Book selection component for the canvas reader application.
+Fetches available books from the server and displays them as a selectable list.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_components_BookChooser.jsx.html">src/components/BookChooser.jsx</a>, <a href="src_components_BookChooser.jsx.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Book selection component for the canvas reader application.
+Fetches available books from the server and displays them as a selectable list.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/components/CanvasReader.jsx
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Main canvas-based text reader component.
+Renders text content on an HTML5 canvas using an offscreen canvas and Web Worker
+for high-performance rendering with support for custom fonts, searching, and scrolling.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_components_CanvasReader.jsx.html">src/components/CanvasReader.jsx</a>, <a href="src_components_CanvasReader.jsx.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Main canvas-based text reader component.
+Renders text content on an HTML5 canvas using an offscreen canvas and Web Worker
+for high-performance rendering with support for custom fonts, searching, and scrolling.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/components/Reader.jsx
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Styled reader component with complete reading interface.
+Similar to ReaderNoStyle but includes CSS styling and handles book formats.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_components_Reader.jsx.html">src/components/Reader.jsx</a>, <a href="src_components_Reader.jsx.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Styled reader component with complete reading interface.
+Similar to ReaderNoStyle but includes CSS styling and handles book formats.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/components/ReaderNoStyle.jsx
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Top-level reader component that combines book selection and canvas rendering.
+Provides a complete reading interface with book chooser, search input, and canvas reader.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_components_ReaderNoStyle.jsx.html">src/components/ReaderNoStyle.jsx</a>, <a href="src_components_ReaderNoStyle.jsx.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Top-level reader component that combines book selection and canvas rendering.
+Provides a complete reading interface with book chooser, search input, and canvas reader.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/constants/constants.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Application-wide constants for the canvas reader.
+Defines message types for worker communication and server configuration.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_constants_constants.js.html">src/constants/constants.js</a>, <a href="src_constants_constants.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Application-wide constants for the canvas reader.
+Defines message types for worker communication and server configuration.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/hooks/useReaderAutoScroll.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>React hook for automatic scrolling functionality in the canvas reader.
+Provides configurable auto-scroll with adjustable speed and amount.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_hooks_useReaderAutoScroll.js.html">src/hooks/useReaderAutoScroll.js</a>, <a href="src_hooks_useReaderAutoScroll.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>React hook for automatic scrolling functionality in the canvas reader.
+Provides configurable auto-scroll with adjustable speed and amount.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/main.jsx
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Application entry point.
+Initializes the React application and renders the main Reader component.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_main.jsx.html">src/main.jsx</a>, <a href="src_main.jsx.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Application entry point.
+Initializes the React application and renders the main Reader component.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/utils/reader-utils.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Text processing utilities for the canvas reader.
+Provides functions for text measurement, line breaking, search, and formatting.
+Many functions are functional wrappers around Ramda operations for consistency.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_utils_reader-utils.js.html">src/utils/reader-utils.js</a>, <a href="src_utils_reader-utils.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Text processing utilities for the canvas reader.
+Provides functions for text measurement, line breaking, search, and formatting.
+Many functions are functional wrappers around Ramda operations for consistency.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/utils/scrollbar.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Scrollbar implementation for canvas-based text rendering.
+Provides a draggable scrollbar with automatic positioning based on scroll percentage.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_utils_scrollbar.js.html">src/utils/scrollbar.js</a>, <a href="src_utils_scrollbar.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Scrollbar implementation for canvas-based text rendering.
+Provides a draggable scrollbar with automatic positioning based on scroll percentage.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/utils/utils.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>General utility functions for the canvas reader application.
+Includes helpers for conditional logic, canvas scaling, mouse positioning, and resize observation.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_utils_utils.js.html">src/utils/utils.js</a>, <a href="src_utils_utils.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>General utility functions for the canvas reader application.
+Includes helpers for conditional logic, canvas scaling, mouse positioning, and resize observation.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        
+            src/workers/reader.worker.js
+        
+        </h2>
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+
+<dl class="details">
+    
+    <dt class="tag-description">Description:</dt>
+    <dd class="tag-description"><ul class="dummy"><li><p>Web Worker for canvas-based text rendering.
+Handles all text processing, layout, search, and rendering operations off the main thread
+to maintain UI responsiveness. Uses offscreen canvas for drawing.</p></li></ul></dd>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_workers_reader.worker.js.html">src/workers/reader.worker.js</a>, <a href="src_workers_reader.worker.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+            
+                <div class="description usertext"><p>Web Worker for canvas-based text rendering.
+Handles all text processing, layout, search, and rendering operations off the main thread
+to maintain UI responsiveness. Uses offscreen canvas for drawing.</p></div>
+            
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

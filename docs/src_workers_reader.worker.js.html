@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/workers/reader.worker.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#BookChooser">BookChooser</a></li><li><a href="global.html#CanvasReader">CanvasReader</a></li><li><a href="global.html#HOST">HOST</a></li><li><a href="global.html#LINE_BREAK">LINE_BREAK</a></li><li><a href="global.html#NODE_SERVER_PORT">NODE_SERVER_PORT</a></li><li><a href="global.html#PORT">PORT</a></li><li><a href="global.html#Reader">Reader</a></li><li><a href="global.html#Whether">Whether</a></li><li><a href="global.html#applyScrollDelta">applyScrollDelta</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#computeRatio">computeRatio</a></li><li><a href="global.html#ctx">ctx</a></li><li><a href="global.html#draw">draw</a></li><li><a href="global.html#fillStyle">fillStyle</a></li><li><a href="global.html#firstTrue">firstTrue</a></li><li><a href="global.html#getCanvasHeight">getCanvasHeight</a></li><li><a href="global.html#getHeight">getHeight</a></li><li><a href="global.html#getScrollOffset">getScrollOffset</a></li><li><a href="global.html#getTextHeight">getTextHeight</a></li><li><a href="global.html#getWidth">getWidth</a></li><li><a href="global.html#getX">getX</a></li><li><a href="global.html#getY">getY</a></li><li><a href="global.html#handleMouseDown">handleMouseDown</a></li><li><a href="global.html#handleMouseMove">handleMouseMove</a></li><li><a href="global.html#handleMouseUp">handleMouseUp</a></li><li><a href="global.html#height">height</a></li><li><a href="global.html#joinLines">joinLines</a></li><li><a href="global.html#lineHeight">lineHeight</a></li><li><a href="global.html#lineSpacer">lineSpacer</a></li><li><a href="global.html#lines">lines</a></li><li><a href="global.html#linesRaw">linesRaw</a></li><li><a href="global.html#measureFn">measureFn</a></li><li><a href="global.html#measureWordSet">measureWordSet</a></li><li><a href="global.html#memo">memo</a></li><li><a href="global.html#paragraphs">paragraphs</a></li><li><a href="global.html#quickStringSearch">quickStringSearch</a></li><li><a href="global.html#ratio">ratio</a></li><li><a href="global.html#rawContent">rawContent</a></li><li><a href="global.html#rebuildContent">rebuildContent</a></li><li><a href="global.html#reduceLines">reduceLines</a></li><li><a href="global.html#relativeMousePos">relativeMousePos</a></li><li><a href="global.html#resizeCanvas">resizeCanvas</a></li><li><a href="global.html#scrollBar">scrollBar</a></li><li><a href="global.html#searchText">searchText</a></li><li><a href="global.html#searcher">searcher</a></li><li><a href="global.html#setCanvasHeight">setCanvasHeight</a></li><li><a href="global.html#setCanvasWidth">setCanvasWidth</a></li><li><a href="global.html#setScrollOffset">setScrollOffset</a></li><li><a href="global.html#setTextHeight">setTextHeight</a></li><li><a href="global.html#setupScrollBar">setupScrollBar</a></li><li><a href="global.html#size">size</a></li><li><a href="global.html#splitLines">splitLines</a></li><li><a href="global.html#stopMouseEvents">stopMouseEvents</a></li><li><a href="global.html#textCenter">textCenter</a></li><li><a href="global.html#updateCanvas">updateCanvas</a></li><li><a href="global.html#updateFontProps">updateFontProps</a></li><li><a href="global.html#updateSearch">updateSearch</a></li><li><a href="global.html#useResizeObserver">useResizeObserver</a></li><li><a href="global.html#width">width</a></li></ul>
+    
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/workers/reader.worker.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @fileoverview Web Worker for canvas-based text rendering.
+ * Handles all text processing, layout, search, and rendering operations off the main thread
+ * to maintain UI responsiveness. Uses offscreen canvas for drawing.
+ */
+
+import { MESSAGES } from '../constants/constants.js';
+import {
+  joinLines,
+  measureWordSet,
+  memo,
+  quickStringSearch,
+  reduceLines,
+  splitLines,
+} from '../utils/reader-utils.js';
+import { setupScrollBar } from '../utils/scrollbar.js';
+
+/** @constant {boolean} Whether to search by paragraphs (true) or by wrapped lines (false) */
+const SEARCH_PARAGRAPHS = false;
+
+/** Canvas 2D rendering context @type {CanvasRenderingContext2D|null} */
+let ctx;
+/** Canvas width in pixels @type {number} */
+let width;
+/** Canvas height in pixels @type {number} */
+let height;
+/** Device pixel ratio for high-DPI displays @type {number} */
+let ratio;
+/** Current search query text @type {string} */
+let searchText = '';
+/** Memoized search function @type {Function|null} */
+let searcher;
+/** Function to measure text width @type {Function|null} */
+let measureFn;
+/** Line height multiplier @type {number} */
+let lineHeight = 1.1;
+/** Text fill color @type {string} */
+let fillStyle;
+/** Font size in pixels @type {number} */
+let size = 15;
+/** Raw text content from the book file @type {string} */
+let rawContent;
+/** Content split into paragraphs @type {string[]} */
+let paragraphs = [];
+/** Current lines to display (filtered by search if active) @type {string[]} */
+let lines = [];
+/** All lines wrapped to canvas width @type {string[]} */
+let linesRaw = [];
+/** Scrollbar instance @type {Object|null} */
+let scrollBar;
+
+/**
+ * Updates the search filter and rebuilds the visible lines array.
+ * If searching by paragraphs, re-wraps matched paragraphs to lines.
+ * If searching by lines, filters the wrapped lines directly.
+ *
+ * @param {string} txt - Search query text (empty string shows all content)
+ */
+const updateSearch = (txt) => {
+  searchText = txt;
+
+  if (SEARCH_PARAGRAPHS) {
+    if (searchText) {
+      const { results } = joinLines(
+        searcher ? searcher(searchText) : paragraphs
+      );
+      linesRaw = results;
+      lines = reduceLines(measureFn, width - 5, linesRaw);
+    } else {
+      lines = paragraphs;
+    }
+  } else if (searchText &amp;&amp; searcher) {
+    const { results } = searcher(searchText);
+    lines = results;
+  } else {
+    lines = linesRaw;
+  }
+
+  if (scrollBar) {
+    scrollBar.setTextHeight(size * lineHeight * lines.length);
+    scrollBar.setScrollOffset(0);
+  }
+};
+
+/**
+ * Renders the visible portion of text to the canvas.
+ * Uses virtual scrolling to only render lines that are currently visible on screen.
+ * Calculates which lines to render based on scroll offset, then draws scrollbar.
+ *
+ * @returns {void}
+ */
+const updateCanvas = () => {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, width, height);
+  let line;
+  let idx;
+  let yPos;
+  const offset = scrollBar.getScrollOffset();
+  const firstIdx = Math.floor(-offset / size / lineHeight);
+  const lastIdx = Math.ceil(height / (lineHeight * size)) + firstIdx;
+
+  for (idx = firstIdx; idx &lt;= lastIdx; idx++) {
+    line = lines[idx];
+    if (line === undefined) break;
+    yPos = idx * lineHeight * size + offset;
+    if (yPos >= -(lineHeight * size) &amp;&amp; yPos &lt; height) {
+      ctx.fillText(line, 0, yPos);
+    }
+    if (yPos > height) {
+      break;
+    }
+  }
+
+  scrollBar.draw();
+};
+
+/**
+ * Updates font-related rendering properties on the canvas context.
+ * Applies font style, size, alignment, colors, and line height from the provided configuration.
+ *
+ * @param {Object} changed - Font property configuration object
+ * @param {string} changed.font - Complete CSS font string (style variant weight size family)
+ * @param {string} changed.baseline - Text baseline (top, middle, bottom, alphabetic)
+ * @param {string} changed.align - Text alignment (left, center, right)
+ * @param {string} changed.fillStyle - Fill color for text
+ * @param {string} changed.strokeStyle - Stroke color for text
+ * @param {number} changed.lineHeight - Line height multiplier
+ * @param {number} changed.size - Font size in pixels
+ */
+const updateFontProps = (changed) => {
+  const { font, baseline, align, strokeStyle } = changed;
+  lineHeight = changed.lineHeight;
+  size = changed.size;
+  fillStyle = changed.fillStyle;
+  if (!ctx) return;
+  ctx.font = font;
+  ctx.textBaseline = baseline;
+  ctx.textAlign = align;
+  ctx.fillStyle = fillStyle;
+  ctx.strokeStyle = strokeStyle;
+};
+
+/**
+ * Displays a centered message on the canvas.
+ * Used for loading indicators and status messages.
+ * Saves and restores canvas state to avoid affecting other rendering.
+ *
+ * @param {string} message - Text message to display
+ * @returns {void}
+ */
+const textCenter = (message) => {
+  if (!ctx) return;
+  ctx.save();
+  ctx.clearRect(0, 0, width, height);
+  ctx.font = '15px Helvetica';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'black';
+  ctx.fillText(message, width / 2, height / 2);
+  ctx.restore();
+};
+
+/**
+ * Processes raw content and rebuilds the searchable data structures.
+ * Depending on SEARCH_PARAGRAPHS setting, either:
+ * - Splits into paragraphs and creates paragraph searcher, OR
+ * - Wraps text to lines and creates line searcher
+ * Creates a memoized search function for performance.
+ *
+ * @returns {void}
+ */
+const rebuildContent = () => {
+  if (SEARCH_PARAGRAPHS) {
+    paragraphs = splitLines(rawContent);
+    searcher = memo(quickStringSearch(paragraphs));
+  } else {
+    linesRaw = reduceLines(measureFn, width - 5, rawContent);
+    searcher = memo(quickStringSearch(linesRaw));
+  }
+};
+
+/**
+ * Web Worker message handler.
+ * Processes messages from the main thread to control canvas rendering, scrolling,
+ * search, and user interactions. Supported message types:
+ * - INIT: Initialize worker with canvas and configuration
+ * - KILL: Terminate worker (cleanup)
+ * - SCROLL: Apply scroll delta
+ * - UPDATE: Update font properties and re-render
+ * - SEARCH: Update search query and filter content
+ * - MOUSE_DOWN/MOUSE_UP/MOUSE_MOVE: Forward mouse events to scrollbar
+ *
+ * @param {MessageEvent} evt - Message event from main thread
+ * @param {Object} evt.data - Message data object
+ * @param {string} evt.data.type - Message type (from MESSAGES constant)
+ */
+self.onmessage = (evt) => {
+  switch (evt.data.type) {
+    case MESSAGES.INIT: {
+      const { route, canvas } = evt.data;
+      width = evt.data.width;
+      height = evt.data.height;
+      ctx = canvas.getContext('2d');
+      measureFn = measureWordSet(ctx);
+      scrollBar = setupScrollBar({
+        ctx,
+        canvasWidth: width,
+        canvasHeight: height,
+        updateCanvas,
+      });
+      updateFontProps(evt.data);
+      ratio = evt.data.ratio;
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      textCenter(`Loading ${route}`);
+      fetch(route)
+        .then((res) => res.text())
+        .then((content) => {
+					console.log(content);
+          textCenter(`Content Loaded (${content.length}), parsing...`);
+          rawContent = content;
+          requestAnimationFrame(() => {
+            rebuildContent();
+            updateSearch('');
+            scrollBar.setScrollOffset(0);
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      break;
+    }
+    case MESSAGES.KILL: {
+      break;
+    }
+    case MESSAGES.SCROLL: {
+      const { scrollDelta } = evt.data;
+      scrollBar.applyScrollDelta(scrollDelta);
+      break;
+    }
+    case MESSAGES.UPDATE: {
+      updateFontProps(evt.data);
+      updateCanvas();
+      break;
+    }
+    case MESSAGES.SEARCH: {
+      updateSearch(evt.data.searchText);
+      updateCanvas();
+      break;
+    }
+    case MESSAGES.MOUSE_DOWN:
+      scrollBar.handleMouseDown(evt.data);
+      break;
+    case MESSAGES.MOUSE_UP:
+      scrollBar.handleMouseUp(evt.data);
+      break;
+    case MESSAGES.MOUSE_MOVE:
+      if (scrollBar) {
+        scrollBar.handleMouseMove(evt.data);
+      }
+      break;
+    default:
+      console.log('?', evt);
+  }
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 4.0.5</a> using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
