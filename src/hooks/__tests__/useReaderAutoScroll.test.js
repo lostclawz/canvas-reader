@@ -19,9 +19,7 @@ describe('useReaderAutoScroll', () => {
     const messages = [];
     const mockWorker = { postMessage: (msg) => messages.push(msg) };
 
-    renderHook(() =>
-      useReaderAutoScroll(mockWorker, { enabled: false, time: 60, amount: 2 })
-    );
+    renderHook(() => useReaderAutoScroll(mockWorker, { enabled: false, time: 60, amount: 2 }));
 
     clock.tick(1000);
     expect(messages.length).to.equal(0);
@@ -31,9 +29,7 @@ describe('useReaderAutoScroll', () => {
     const messages = [];
     const mockWorker = { postMessage: (msg) => messages.push(msg) };
 
-    renderHook(() =>
-      useReaderAutoScroll(mockWorker, { enabled: true, time: 100, amount: 5 })
-    );
+    renderHook(() => useReaderAutoScroll(mockWorker, { enabled: true, time: 100, amount: 5 }));
 
     clock.tick(100);
     expect(messages.length).to.equal(1);
@@ -47,9 +43,7 @@ describe('useReaderAutoScroll', () => {
     const messages = [];
     const mockWorker = { postMessage: (msg) => messages.push(msg) };
 
-    renderHook(() =>
-      useReaderAutoScroll(mockWorker, { enabled: true, time: 60, amount: 10 })
-    );
+    renderHook(() => useReaderAutoScroll(mockWorker, { enabled: true, time: 60, amount: 10 }));
 
     clock.tick(60);
     expect(messages.length).to.equal(1);

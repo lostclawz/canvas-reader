@@ -2,8 +2,8 @@ import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { expect } from 'chai';
 import React from 'react';
 import sinon from 'sinon';
-import { CanvasReader } from '../CanvasReader.jsx';
 import { MESSAGES } from '../../constants/constants.js';
+import { CanvasReader } from '../CanvasReader.jsx';
 
 describe('CanvasReader', () => {
   let mockWorker;
@@ -27,19 +27,17 @@ describe('CanvasReader', () => {
     transferControlToOffscreenStub = sinon.stub().returns(mockOffscreenCanvas);
 
     const originalCreateElement = document.createElement.bind(document);
-    createElementStub = sinon
-      .stub(document, 'createElement')
-      .callsFake((tagName) => {
-        const element = originalCreateElement(tagName);
-        if (tagName === 'canvas') {
-          element.transferControlToOffscreen = transferControlToOffscreenStub;
-          element.getContext = sinon.stub().returns({
-            fillRect: sinon.spy(),
-            clearRect: sinon.spy(),
-          });
-        }
-        return element;
-      });
+    createElementStub = sinon.stub(document, 'createElement').callsFake((tagName) => {
+      const element = originalCreateElement(tagName);
+      if (tagName === 'canvas') {
+        element.transferControlToOffscreen = transferControlToOffscreenStub;
+        element.getContext = sinon.stub().returns({
+          fillRect: sinon.spy(),
+          clearRect: sinon.spy(),
+        });
+      }
+      return element;
+    });
   });
 
   afterEach(() => {
@@ -55,9 +53,7 @@ describe('CanvasReader', () => {
   });
 
   it('sets canvas dimensions from props', () => {
-    const { container } = render(
-      <CanvasReader canvasWidth={1000} canvasHeight={600} />
-    );
+    const { container } = render(<CanvasReader canvasWidth={1000} canvasHeight={600} />);
     const canvas = container.querySelector('canvas');
     expect(canvas.width).to.equal(1000);
     expect(canvas.height).to.equal(600);

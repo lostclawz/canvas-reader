@@ -3,8 +3,8 @@
  * Handles fetching book lists and book content from external sources.
  */
 
-import { Router } from 'express';
 import apicache from 'apicache';
+import { Router } from 'express';
 
 const router = Router();
 const cache = apicache.middleware;
@@ -38,20 +38,20 @@ const cache = apicache.middleware;
  * }
  */
 router.get('/books', cache('1 day'), async (_req, res) => {
-	try {
-		console.log('Fetching books from Gutendex...');
-		const response = await fetch('https://gutendex.com/books');
+  try {
+    console.log('Fetching books from Gutendex...');
+    const response = await fetch('https://gutendex.com/books');
 
-		if (!response.ok) {
-			throw new Error(`Failed to fetch books: ${response.statusText}`);
-		}
+    if (!response.ok) {
+      throw new Error(`Failed to fetch books: ${response.statusText}`);
+    }
 
-		const data = await response.json();
-		res.json(data);
-	} catch (error) {
-		console.error('Error fetching books:', error);
-		res.status(500).json({ error: error.message });
-	}
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 /**
@@ -74,26 +74,26 @@ router.get('/books', cache('1 day'), async (_req, res) => {
  * [Full book text content...]
  */
 router.get('/book-text', cache('1 day'), async (req, res) => {
-	const { url } = req.query;
+  const { url } = req.query;
 
-	if (!url) {
-		return res.status(400).json({ error: 'URL parameter is required' });
-	}
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required' });
+  }
 
-	try {
-		console.log(`Fetching book from: ${url}`);
-		const response = await fetch(url);
+  try {
+    console.log(`Fetching book from: ${url}`);
+    const response = await fetch(url);
 
-		if (!response.ok) {
-			throw new Error(`Failed to fetch: ${response.statusText}`);
-		}
+    if (!response.ok) {
+      throw new Error(`Failed to fetch: ${response.statusText}`);
+    }
 
-		const text = await response.text();
-		res.type('text/plain').send(text);
-	} catch (error) {
-		console.error('Error fetching book:', error);
-		res.status(500).json({ error: error.message });
-	}
+    const text = await response.text();
+    res.type('text/plain').send(text);
+  } catch (error) {
+    console.error('Error fetching book:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 export default router;

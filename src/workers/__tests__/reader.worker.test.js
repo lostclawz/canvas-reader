@@ -136,7 +136,10 @@ describe('reader.worker', () => {
     it('should have worker file at expected location', async () => {
       const { default: fs } = await import('node:fs');
       const { default: path } = await import('node:path');
-      const workerPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../reader.worker.js');
+      const workerPath = path.join(
+        path.dirname(new URL(import.meta.url).pathname),
+        '../reader.worker.js'
+      );
       expect(fs.existsSync(workerPath)).to.be.true;
     });
   });

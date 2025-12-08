@@ -4,14 +4,15 @@
  * Acts as a proxy server to handle CORS restrictions when accessing book data.
  */
 
-import express from 'express';
-import cors from 'cors';
-import { fileURLToPath } from 'node:url';
 import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import cors from 'cors';
+import express from 'express';
 
 import booksRoutes from './routes/books.js';
 import cacheRoutes from './routes/cache.js';
 import healthRoutes from './routes/health.js';
+import searchRoutes from './routes/search.js';
 
 const app = express();
 /** Server port number from environment variable or default to 3001 @type {number} */
@@ -24,6 +25,7 @@ app.use(cors());
 app.use('/api', booksRoutes);
 app.use('/api/cache', cacheRoutes);
 app.use('/health', healthRoutes);
+app.use('/api', searchRoutes);
 
 /**
  * Start the server listener.
@@ -33,10 +35,10 @@ app.use('/health', healthRoutes);
 const isMainModule = fileURLToPath(import.meta.url) === resolve(process.argv[1]);
 
 if (isMainModule) {
-	app.listen(PORT, () => {
-		console.log(`Server running on http://localhost:${PORT}`);
-		console.log('Press Ctrl+C to stop the server');
-	});
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log('Press Ctrl+C to stop the server');
+  });
 }
 
 export default app;

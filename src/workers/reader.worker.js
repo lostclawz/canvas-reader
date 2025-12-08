@@ -61,9 +61,7 @@ const updateSearch = (txt) => {
 
   if (SEARCH_PARAGRAPHS) {
     if (searchText) {
-      const { results } = joinLines(
-        searcher ? searcher(searchText) : paragraphs
-      );
+      const { results } = joinLines(searcher ? searcher(searchText) : paragraphs);
       linesRaw = results;
       lines = reduceLines(measureFn, width - 5, linesRaw);
     } else {
@@ -215,7 +213,7 @@ self.onmessage = (evt) => {
       fetch(route)
         .then((res) => res.text())
         .then((content) => {
-					console.log(content);
+          console.log(content);
           textCenter(`Content Loaded (${content.length}), parsing...`);
           rawContent = content;
           requestAnimationFrame(() => {

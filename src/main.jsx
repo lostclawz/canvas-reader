@@ -3,9 +3,9 @@
  * Initializes the React application and renders the main Reader component.
  */
 
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import Reader from './components/Reader.jsx'
+import React from 'react';
+import { createRoot } from 'react-dom/client';
+import Reader from './components/Reader.jsx';
 
 /**
  * Application initialization.
@@ -16,4 +16,4 @@ createRoot(document.getElementById('app')).render(
   <React.StrictMode>
     <Reader size={800} fontSize={16} />
   </React.StrictMode>
-)
+);

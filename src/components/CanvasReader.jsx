@@ -6,14 +6,9 @@
 
 import React, { useEffect, useRef } from 'react';
 import { MESSAGES } from '../constants/constants';
-import { stopMouseEvents } from '../utils/reader-utils';
 import useReaderAutoScroll from '../hooks/useReaderAutoScroll';
-import {
-  computeRatio,
-  firstTrue,
-  relativeMousePos,
-  useResizeObserver,
-} from '../utils/utils';
+import { stopMouseEvents } from '../utils/reader-utils';
+import { computeRatio, firstTrue, relativeMousePos, useResizeObserver } from '../utils/utils';
 
 const DEFAULT_FONTSTYLE = 'normal';
 const getFontStyle = firstTrue(DEFAULT_FONTSTYLE);
@@ -132,15 +127,11 @@ export const CanvasReader = ({
 
   const workerRef = useRef(null);
   useEffect(() => {
-    workerRef.current = new Worker(
-      new URL('../workers/reader.worker.js', import.meta.url),
-      { type: 'module' }
-    );
+    workerRef.current = new Worker(new URL('../workers/reader.worker.js', import.meta.url), {
+      type: 'module',
+    });
     return () => {
-      if (
-        workerRef.current &&
-        typeof workerRef.current.terminate === 'function'
-      ) {
+      if (workerRef.current && typeof workerRef.current.terminate === 'function') {
         workerRef.current.postMessage({ type: 'kill' });
         workerRef.current.terminate();
       }

@@ -13,6 +13,8 @@
       "!**/dist",
       "!**/build",
       "!**/coverage",
+      "!**/docs",
+      "!**/__tests__/mocha-setup.js",
       "!**/.nyc_output",
       "!**/*.min.js"
     ]
@@ -115,7 +117,26 @@
       "linter": {
         "rules": {
           "correctness": {
-            "noUnusedVariables": "off"
+            "noUnusedVariables": "off",
+            "noUnusedImports": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "**/__tests__/**/*.{js,jsx,ts,tsx}",
+        "**/*.test.{js,jsx,ts,tsx}",
+        "**/*.spec.{js,jsx,ts,tsx}"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noEmptyBlockStatements": "off"
+          },
+          "correctness": {
+            "noUndeclaredVariables": "off",
+            "noUnusedImports": "off"
           }
         }
       }

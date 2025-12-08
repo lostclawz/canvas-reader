@@ -5,9 +5,9 @@
 
 import '../styles/reader.css';
 import React, { memo, useState } from 'react';
+import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 import BookChooser from './BookChooser.jsx';
 import CanvasReader from './CanvasReader.jsx';
-import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 
 /**
  * Reader component props.

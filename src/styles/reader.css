@@ -1,30 +1,33 @@
 body {
-	font-family: 'EB Garamond', serif;
+  font-family: "EB Garamond", serif;
 }
-.reader { display: flex; gap: 16px; }
-.book-chooser { width: 240px; }
+.reader {
+  display: flex;
+  gap: 16px;
+}
+.book-chooser {
+  width: 240px;
+}
 
 .book-chooser {
-	display: flex;
-	flex-flow: row wrap;
+  display: flex;
+  flex-flow: row wrap;
 }
 
 .book-chooser button:after {
-	content: ' // '
+  content: " // ";
 }
 .book-chooser button:hover {
-	border-bottom: 1px black solid;
+  border-bottom: 1px black solid;
 }
 .book-chooser button {
-	font-family: "Fira Code", sans-serif;
-	font-size: 10px;
-	background-color: transparent;
-	margin: 0.25em;
-	border-style: dashed;
-	border-radius: 1px;
-	box-shadow: none;
-	border-width: 1px;
-	outline: none;
-	border: none;
-	text-align: left;
+  font-family: "Fira Code", sans-serif;
+  font-size: 10px;
+  background-color: transparent;
+  margin: 0.25em;
+  border-radius: 1px;
+  box-shadow: none;
+  outline: none;
+  border: none;
+  text-align: left;
 }

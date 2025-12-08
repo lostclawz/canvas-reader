@@ -87,13 +87,13 @@ export const reduceLines = (measureFn, maxWidth, text) =>
             R.ifElse(
               R.gt(R.__, maxWidth),
               () => lines.concat([[word]]),
-              () => R.adjust(-1, R.append(word), lines),
-            ),
+              () => R.adjust(-1, R.append(word), lines)
+            )
           )(lines),
-        [[]],
-      ),
+        [[]]
+      )
     ),
-    R.map(R.join(' ')),
+    R.map(R.join(' '))
   )(text);
 
 /**
@@ -107,43 +107,61 @@ export const reduceLines = (measureFn, maxWidth, text) =>
 /**
  * Creates a case-insensitive search function for an array of strings.
  * Returns a curried function that performs the search when given a query.
+ * Includes one line before and one line after each match for context.
  *
  * @param {string[]} list - Array of strings to search within
  * @returns {Function} Search function that takes a search term and returns results
  *
  * @example
- * const lines = ['Hello World', 'Goodbye World', 'Test Line'];
+ * const lines = ['Line 1', 'Hello World', 'Line 3', 'Goodbye World', 'Line 5'];
  * const search = quickStringSearch(lines);
  *
  * const results = search('world');
  * // Returns: {
  * //   searchText: 'world',
- * //   results: ['Hello World', '\n', 'Goodbye World'],
+ * //   results: ['Line 1', '\n', 'Hello World', '\n', 'Line 3', '\n', 'Goodbye World', '\n', 'Line 5'],
  * //   total: 2
  * // }
  *
  * search(''); // Returns original list (no search)
  */
-export const quickStringSearch = (list) => (searchFor = '') => {
-  let i;
-  const results = [];
-  let total = 0;
-  if (!searchFor) {
-    return list;
-  }
-  const s = searchFor.toLowerCase();
-  for (i = 0; i < list.length; i++) {
-    if (list[i].toLowerCase().indexOf(s) >= 0) {
-      total++;
-      results.push(list[i]);
+export const quickStringSearch =
+  (list) =>
+  (searchFor = '') => {
+    let i;
+    const results = [];
+    let total = 0;
+    if (!searchFor) {
+      return list;
     }
-  }
-  return {
-    searchText: searchFor,
-    results: lineSpacer(results),
-    total,
+    const s = searchFor.toLowerCase();
+    const indicesSet = new Set();
+
+    // First pass: find all matches and collect indices with context
+    for (i = 0; i < list.length; i++) {
+      if (list[i].toLowerCase().indexOf(s) >= 0) {
+        total++;
+        // Add the line before (if it exists)
+        if (i > 0) indicesSet.add(i - 1);
+        // Add the matching line
+        indicesSet.add(i);
+        // Add the line after (if it exists)
+        if (i < list.length - 1) indicesSet.add(i + 1);
+      }
+    }
+
+    // Convert to sorted array and build results
+    const sortedIndices = Array.from(indicesSet).sort((a, b) => a - b);
+    for (i = 0; i < sortedIndices.length; i++) {
+      results.push(list[sortedIndices[i]]);
+    }
+
+    return {
+      searchText: searchFor,
+      results: lineSpacer(results),
+      total,
+    };
   };
-};
 
 /**
  * Stops event propagation and prevents default behavior.

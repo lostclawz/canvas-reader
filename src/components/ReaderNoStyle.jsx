@@ -4,9 +4,9 @@
  */
 
 import React, { memo, useState } from 'react';
+import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 import BookChooser from './BookChooser.jsx';
 import CanvasReader from './CanvasReader.jsx';
-import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 
 /**
  * Reader component props.
@@ -37,9 +37,7 @@ import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 const Reader = memo(({ size = 800, fontSize = 15 }) => {
   const [book, setBook] = useState(null);
   const [searchText, setSearchText] = useState('');
-  const route = book
-    ? `http://${HOST}:${NODE_SERVER_PORT}/books/?file=${book}`
-    : '';
+  const route = book ? `http://${HOST}:${NODE_SERVER_PORT}/books/?file=${book}` : '';
   return (
     <div className="reader">
       <div>

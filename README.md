@@ -4,11 +4,13 @@ A React-based text reader application that renders books on an HTML canvas with 
 
 ## Features
 
-- Fetches books from Gutendex API
-- Renders text on canvas with customizable font settings
-- Search functionality
-- Auto-scroll capability
-- Custom scrollbar implementation
+- **Book Discovery**: Search and browse books from the Gutendex (Project Gutenberg) API
+- **Advanced Text Search**: Search within book content with contextual results (shows matching line plus one line before and after for better context)
+- **Canvas Rendering**: High-performance text rendering on HTML canvas with customizable font settings
+- **Web Worker Processing**: Text processing runs off the main thread for smooth UI performance
+- **Auto-scroll**: Configurable automatic scrolling through books
+- **Custom Scrollbar**: Responsive scrollbar with drag-to-scroll functionality
+- **Responsive Design**: Works across different screen sizes
 
 ## Project Structure
 
@@ -95,21 +97,37 @@ The application uses:
 
 ## How It Works
 
-1. Express server fetches the book list from Gutendex API
-2. User selects a book from the list
-3. The book's text URL is sent to the local Express server
-4. Express server fetches the text and returns it (avoiding CORS)
-5. The text is processed by a Web Worker
-6. Text is rendered on an HTML canvas with a custom scrollbar
-7. Users can search and scroll through the text
+### Book Discovery Flow
+1. User enters search terms in the BookSearch component
+2. Express server proxies the request to Gutendex API
+3. Results are filtered to show only books with plain text format
+4. User selects a book from the results
+
+### Book Reading Flow
+1. Selected book's text URL is sent to the local Express server
+2. Express server fetches the text and returns it (avoiding CORS)
+3. The text is processed by a Web Worker for optimal performance
+4. Text is rendered on an HTML canvas with a custom scrollbar
+5. Users can search within the book and scroll through the text
+
+### In-Book Search Feature
+The search functionality provides contextual results:
+- When you search for text within a book, results show the matching line **plus one line before and one line after**
+- This provides better context for understanding search results
+- Overlapping context windows are automatically deduplicated
+- Search is case-insensitive
+- Results update in real-time as you type
 
 ## API Endpoints
 
 The Express server provides the following endpoints:
 
 - `GET /api/books` - Fetch list of books from Gutendex API
-- `GET /api/book-text?url=<encoded-url>` - Proxy book text content
+- `GET /api/search?q=<search-query>` - Search for books by title, author, or subject in Gutendex API
+- `GET /api/book-text?url=<encoded-url>` - Proxy book text content (avoids CORS issues)
 - `GET /health` - Health check endpoint
+
+All endpoints include CORS headers and implement caching for improved performance.
 
 ## Code Quality
 
@@ -117,20 +135,27 @@ The Express server provides the following endpoints:
 
 The project has comprehensive test coverage including:
 
-**Frontend Tests** (90 tests):
-- Component tests (React components)
-- Hook tests (custom React hooks)
-- Utility function tests
-- Worker tests
+**Frontend Tests**:
+- Component tests (BookChooser, BookSearch, CanvasReader, Reader)
+- Hook tests (custom React hooks like useReaderAutoScroll)
+- Utility function tests (text processing, search, scrollbar, measurements)
+- Worker tests (Web Worker message handling)
 - Constants tests
 
-**Backend Tests** (27 tests):
+**Backend Tests**:
 - API endpoint tests (using Supertest)
 - Error handling tests
 - CORS configuration tests
 - Edge case tests
 
-**Total: 117 tests passing**
+**Total: 193 tests passing**
+
+Key test coverage areas:
+- Text search with context lines (before/after matching lines)
+- Canvas text rendering and layout
+- Scrollbar interaction and positioning
+- Book search and filtering
+- API proxy functionality
 
 #### Test Coverage
 

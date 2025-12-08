@@ -34,13 +34,7 @@ describe('reader-utils', () => {
   describe('lineSpacer', () => {
     it('should intersperse LINE_BREAK between array elements', () => {
       const result = lineSpacer(['line1', 'line2', 'line3']);
-      expect(result).to.deep.equal([
-        'line1',
-        LINE_BREAK,
-        'line2',
-        LINE_BREAK,
-        'line3',
-      ]);
+      expect(result).to.deep.equal(['line1', LINE_BREAK, 'line2', LINE_BREAK, 'line3']);
     });
 
     it('should handle empty array', () => {
@@ -128,8 +122,7 @@ describe('reader-utils', () => {
     it('should break text into lines that fit maxWidth', () => {
       const measureFn = (words) => words.join(' ').length * 10;
       const maxWidth = 100;
-      const text =
-        'This is a test sentence that should be broken into multiple lines';
+      const text = 'This is a test sentence that should be broken into multiple lines';
 
       const result = reduceLines(measureFn, maxWidth, text);
 
@@ -179,13 +172,18 @@ describe('reader-utils', () => {
       'UPPERCASE TEXT',
     ];
 
-    it('should find matching lines case-insensitively', () => {
+    it('should find matching lines case-insensitively with context', () => {
       const search = quickStringSearch(testList);
       const result = search('quick');
 
       expect(result).to.have.property('searchText', 'quick');
       expect(result).to.have.property('total', 2);
       expect(result.results).to.be.an('array');
+      // 'quick' matches indices 0 and 3
+      // With context: 0 gets [0,1], 3 gets [2,3,4]
+      // Combined unique: [0,1,2,3,4] = all 5 lines
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      expect(resultLines).to.have.lengthOf(5);
     });
 
     it('should return all lines when search is empty', () => {
@@ -203,18 +201,30 @@ describe('reader-utils', () => {
       expect(result.results).to.be.an('array').with.lengthOf(0);
     });
 
-    it('should handle partial matches', () => {
+    it('should handle partial matches with context', () => {
       const search = quickStringSearch(testList);
       const result = search('fox');
 
       expect(result.total).to.equal(1);
+      // 'fox' matches index 0
+      // With context: [0, 1]
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      expect(resultLines).to.have.lengthOf(2);
+      expect(resultLines[0]).to.equal('The quick brown fox');
+      expect(resultLines[1]).to.equal('jumps over the lazy dog');
     });
 
-    it('should be case-insensitive', () => {
+    it('should be case-insensitive with context', () => {
       const search = quickStringSearch(testList);
       const result = search('UPPERCASE');
 
       expect(result.total).to.equal(1);
+      // 'UPPERCASE' matches index 4
+      // With context: [3, 4] (no line after since it's the last line)
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      expect(resultLines).to.have.lengthOf(2);
+      expect(resultLines[0]).to.equal('Quick test of search');
+      expect(resultLines[1]).to.equal('UPPERCASE TEXT');
     });
 
     it('should intersperse results with LINE_BREAK', () => {
@@ -237,6 +247,76 @@ describe('reader-utils', () => {
       const result = search();
 
       expect(result).to.deep.equal(testList);
+    });
+
+    it('should include context line before match when available', () => {
+      const list = ['line 0', 'line 1', 'match here', 'line 3'];
+      const search = quickStringSearch(list);
+      const result = search('match');
+
+      expect(result.total).to.equal(1);
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      // Should include line 1 (before), line 2 (match), line 3 (after)
+      expect(resultLines).to.have.lengthOf(3);
+      expect(resultLines[0]).to.equal('line 1');
+      expect(resultLines[1]).to.equal('match here');
+      expect(resultLines[2]).to.equal('line 3');
+    });
+
+    it('should include context line after match when available', () => {
+      const list = ['line 0', 'match here', 'line 2', 'line 3'];
+      const search = quickStringSearch(list);
+      const result = search('match');
+
+      expect(result.total).to.equal(1);
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      // Should include line 0 (before), line 1 (match), line 2 (after)
+      expect(resultLines).to.have.lengthOf(3);
+      expect(resultLines[0]).to.equal('line 0');
+      expect(resultLines[1]).to.equal('match here');
+      expect(resultLines[2]).to.equal('line 2');
+    });
+
+    it('should not include context before first line', () => {
+      const list = ['match here', 'line 1', 'line 2'];
+      const search = quickStringSearch(list);
+      const result = search('match');
+
+      expect(result.total).to.equal(1);
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      // Should include line 0 (match), line 1 (after)
+      expect(resultLines).to.have.lengthOf(2);
+      expect(resultLines[0]).to.equal('match here');
+      expect(resultLines[1]).to.equal('line 1');
+    });
+
+    it('should not include context after last line', () => {
+      const list = ['line 0', 'line 1', 'match here'];
+      const search = quickStringSearch(list);
+      const result = search('match');
+
+      expect(result.total).to.equal(1);
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      // Should include line 1 (before), line 2 (match)
+      expect(resultLines).to.have.lengthOf(2);
+      expect(resultLines[0]).to.equal('line 1');
+      expect(resultLines[1]).to.equal('match here');
+    });
+
+    it('should deduplicate overlapping context windows', () => {
+      const list = ['line 0', 'match 1', 'match 2', 'line 3'];
+      const search = quickStringSearch(list);
+      const result = search('match');
+
+      expect(result.total).to.equal(2);
+      const resultLines = result.results.filter((line) => line !== LINE_BREAK);
+      // Match at 1: [0, 1, 2], Match at 2: [1, 2, 3]
+      // Combined unique: [0, 1, 2, 3] = all 4 lines
+      expect(resultLines).to.have.lengthOf(4);
+      expect(resultLines[0]).to.equal('line 0');
+      expect(resultLines[1]).to.equal('match 1');
+      expect(resultLines[2]).to.equal('match 2');
+      expect(resultLines[3]).to.equal('line 3');
     });
   });
 

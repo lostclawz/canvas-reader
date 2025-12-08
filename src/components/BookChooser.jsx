@@ -23,11 +23,11 @@ import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 
 /**
  * React component that fetches and displays a list of available books.
- * Retrieves the book list from the server on mount and renders clickable buttons
+ * Retrieves the book list from the server on mount and renders a scrollable select list
  * for each book. When a book is selected, the onSelect callback is invoked.
  *
  * @param {BookChooserProps} props - Component props
- * @returns {React.ReactElement|null} List of book selection buttons, or null while loading
+ * @returns {React.ReactElement|null} Scrollable select list of books, or null while loading
  *
  * @example
  * <BookChooser onSelect={(book) => console.log('Selected:', book.title)} />
@@ -40,17 +40,27 @@ const BookChooser = ({ onSelect }) => {
       .then((res) => res.json())
       .then(setBooks);
   }, []);
+
+  const handleChange = (e) => {
+    const selectedBook = books.results.find((b) => b.id.toString() === e.target.value);
+    if (selectedBook) {
+      onSelect(selectedBook);
+    }
+  };
+
   return (
     books && (
-      <ul className="book-chooser list-unstyled">
+      <select
+        className="book-chooser"
+        size={Math.min(books.results.length, 10)}
+        onChange={handleChange}
+      >
         {books.results.map((b) => (
-          <li key={b.id}>
-            <button type="button" onClick={() => onSelect(b)}>
-              {b.title}
-            </button>
-          </li>
+          <option key={b.id} value={b.id}>
+            {b.title}
+          </option>
         ))}
-      </ul>
+      </select>
     )
   );
 };

@@ -3,8 +3,8 @@
  * Provides endpoints for monitoring and managing the API cache.
  */
 
-import { Router } from 'express';
 import apicache from 'apicache';
+import { Router } from 'express';
 
 const router = Router();
 
@@ -19,7 +19,7 @@ const router = Router();
  * // Response includes cache index, performance metrics, etc.
  */
 router.get('/stats', (_req, res) => {
-	res.json(apicache.getPerformance());
+  res.json(apicache.getPerformance());
 });
 
 /**
@@ -29,7 +29,7 @@ router.get('/stats', (_req, res) => {
  * @returns {Object} JSON response with cache index
  */
 router.get('/index', (_req, res) => {
-	res.json(apicache.getIndex());
+  res.json(apicache.getIndex());
 });
 
 /**
@@ -44,9 +44,9 @@ router.get('/index', (_req, res) => {
  * { "message": "Cache cleared" }
  */
 router.delete('/', (_req, res) => {
-	apicache.clear();
-	console.log('Cache cleared');
-	res.json({ message: 'Cache cleared' });
+  apicache.clear();
+  console.log('Cache cleared');
+  res.json({ message: 'Cache cleared' });
 });
 
 export default router;
