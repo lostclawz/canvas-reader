@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { LINE_BREAK, MESSAGES } from '../src/constants/constants.js';
+import { LINE_BREAK, MESSAGES } from '../constants.js';
 
 describe('constants', () => {
   describe('LINE_BREAK', () => {

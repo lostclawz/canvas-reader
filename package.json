@@ -8,7 +8,12 @@
     "server": "node server.js",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "mocha --require esbuild-register --require ./tests/mocha-setup.js 'tests/**/*.{js,jsx}' --exclude 'tests/test-CanvasReader.js'"
+    "test": "mocha --require esbuild-register --require ./__tests__/mocha-setup.js 'src/**/__tests__/**/*.test.{js,jsx}' '__tests__/**/*.test.js'",
+    "test:coverage": "c8 npm test",
+    "test:coverage:old": "nyc npm test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write ."
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -18,13 +23,67 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
     "@testing-library/react": "^16.0.0",
+    "c8": "^10.1.3",
     "chai": "^4.4.1",
     "esbuild-register": "^3.6.0",
     "jsdom": "^24.0.0",
     "jsdom-global": "^3.0.2",
     "mocha": "^10.2.0",
+    "nyc": "^17.1.0",
     "sinon": "^17.0.1",
+    "supertest": "^7.1.4",
     "vite": "^5.0.0"
+  },
+  "c8": {
+    "all": true,
+    "include": [
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "server.js"
+    ],
+    "exclude": [
+      "**/__tests__/**",
+      "**/*.test.js",
+      "**/*.test.jsx",
+      "src/workers/reader.worker.js",
+      "src/main.jsx",
+      "src/components/Reader.jsx"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "check-coverage": true,
+    "lines": 75,
+    "statements": 75,
+    "functions": 70,
+    "branches": 70
+  },
+  "nyc": {
+    "all": true,
+    "include": [
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "server.js"
+    ],
+    "exclude": [
+      "**/__tests__/**",
+      "**/*.test.js",
+      "**/*.test.jsx",
+      "node_modules/**"
+    ],
+    "reporter": [
+      "text",
+      "html",
+      "lcov"
+    ],
+    "check-coverage": true,
+    "lines": 80,
+    "statements": 80,
+    "functions": 80,
+    "branches": 80
   }
 }

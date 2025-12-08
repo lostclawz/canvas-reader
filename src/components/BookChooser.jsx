@@ -1,15 +1,11 @@
-import { head, pipe, split } from 'ramda';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HOST, NODE_SERVER_PORT } from '../constants/constants';
-
-const stripExt = pipe(split('.'), head);
 
 const BookChooser = ({ onSelect }) => {
   const [books, setBooks] = useState(null);
-  // retrieve a list of available files on mount
+  // retrieve a list of available books from the server
   useEffect(() => {
-    // fetch(`http://${HOST}:${NODE_SERVER_PORT}/books`)
-    fetch(`https://gutendex.com/books`)
+    fetch(`http://${HOST}:${NODE_SERVER_PORT}/api/books`)
       .then((res) => res.json())
       .then(setBooks);
   }, []);

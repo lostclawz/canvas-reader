@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { expect } from 'chai';
 import React from 'react';
-import Reader from '../src/components/ReaderNoStyle.jsx';
+import Reader from '../ReaderNoStyle.jsx';
 
 global.fetch = global.fetch || (() => Promise.resolve({ json: () => Promise.resolve([]) }));
 

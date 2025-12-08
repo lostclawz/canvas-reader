@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { LINE_BREAK } from '../src/constants/constants.js';
+import { LINE_BREAK } from '../../constants/constants.js';
 import {
   joinLines,
   lineSpacer,
@@ -9,7 +9,7 @@ import {
   reduceLines,
   splitLines,
   stopMouseEvents,
-} from '../src/utils/reader-utils.js';
+} from '../reader-utils.js';
 
 describe('reader-utils', () => {
   describe('memo', () => {
@@ -258,6 +258,166 @@ describe('reader-utils', () => {
 
       expect(stopPropagationCalled).to.be.true;
       expect(preventDefaultCalled).to.be.true;
+    });
+
+    it('should work with real DOM events', () => {
+      const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+
+      stopMouseEvents(event);
+
+      // Event should be prevented and stopped
+      expect(event.defaultPrevented).to.be.true;
+    });
+  });
+
+  describe('Edge Cases and Integration', () => {
+    it('should handle reduceLines with very long words', () => {
+      const measureFn = (words) => words.join(' ').length * 10;
+      const maxWidth = 50;
+      const text = `a ${'supercalifragilisticexpialidocious'.repeat(3)} b`;
+
+      const result = reduceLines(measureFn, maxWidth, text);
+
+      expect(result).to.be.an('array');
+      result.forEach((line) => {
+        expect(line).to.be.a('string');
+      });
+    });
+
+    it('should handle measureWordSet with special characters', () => {
+      const mockContext = {
+        measureText: (text) => ({ width: text.length * 10 }),
+      };
+
+      const measure = measureWordSet(mockContext);
+      const width = measure(['hello@world', '123-456', 'test_case']);
+
+      expect(width).to.be.a('number');
+      expect(width).to.be.greaterThan(0);
+    });
+
+    it('should handle quickStringSearch with special regex characters', () => {
+      const testList = ['test (parens)', 'test [brackets]', 'test.dot', 'test*star'];
+      const search = quickStringSearch(testList);
+
+      const result1 = search('(');
+      expect(result1.total).to.equal(1);
+
+      const result2 = search('[');
+      expect(result2.total).to.equal(1);
+
+      const result3 = search('.');
+      expect(result3.total).to.equal(1);
+    });
+
+    it('should handle reduceLines with only whitespace', () => {
+      const measureFn = (words) => words.join(' ').length * 10;
+      const maxWidth = 100;
+      const text = '   \n\n   \n   ';
+
+      const result = reduceLines(measureFn, maxWidth, text);
+
+      expect(result).to.be.an('array');
+    });
+
+    it('should handle memo with different argument types', () => {
+      const fn = memo((x) => {
+        if (typeof x === 'object') return JSON.stringify(x);
+        return String(x);
+      });
+
+      expect(fn('test')).to.equal('test');
+      expect(fn(123)).to.equal('123');
+      expect(fn(true)).to.equal('true');
+    });
+
+    it('should handle quickStringSearch with very long search term', () => {
+      const testList = ['short', 'medium length text', 'a'.repeat(1000)];
+      const search = quickStringSearch(testList);
+      const longSearch = 'a'.repeat(500);
+
+      const result = search(longSearch);
+      expect(result.total).to.equal(1);
+    });
+
+    it('should handle reduceLines with mixed whitespace types', () => {
+      const measureFn = (words) => words.join(' ').length * 10;
+      const maxWidth = 100;
+      const text = 'word1\tword2  word3\n\nword4';
+
+      const result = reduceLines(measureFn, maxWidth, text);
+
+      expect(result).to.be.an('array');
+      expect(result.length).to.be.greaterThan(0);
+    });
+
+    it('should handle joinLines and splitLines as inverse operations', () => {
+      const original = ['line1', 'line2', 'line3'];
+      const joined = joinLines(original);
+      const split = splitLines(joined);
+
+      expect(split).to.deep.equal(original);
+    });
+
+    it('should handle lineSpacer with mixed content types', () => {
+      const result = lineSpacer(['a', '', 'b', ' ', 'c']);
+      expect(result).to.include(LINE_BREAK);
+      expect(result.filter((x) => x === LINE_BREAK).length).to.equal(4);
+    });
+
+    it('should handle measureWordSet with empty strings in array', () => {
+      const mockContext = {
+        measureText: (text) => ({ width: text.length * 10 }),
+      };
+
+      const measure = measureWordSet(mockContext);
+      const width = measure(['hello', '', 'world', '']);
+
+      expect(width).to.be.a('number');
+    });
+
+    it('should handle reduceLines with extremely narrow maxWidth', () => {
+      const measureFn = (words) => words.join(' ').length * 10;
+      const maxWidth = 1;
+      const text = 'a b c d';
+
+      const result = reduceLines(measureFn, maxWidth, text);
+
+      expect(result).to.be.an('array');
+      expect(result.length).to.be.greaterThan(0);
+    });
+
+    it('should handle quickStringSearch with unicode characters', () => {
+      const testList = ['hello 世界', 'test café', 'emoji 🎉'];
+      const search = quickStringSearch(testList);
+
+      const result1 = search('世界');
+      expect(result1.total).to.equal(1);
+
+      const result2 = search('café');
+      expect(result2.total).to.equal(1);
+
+      const result3 = search('🎉');
+      expect(result3.total).to.equal(1);
+    });
+
+    it('should handle reduceLines with all single-character words', () => {
+      const measureFn = (words) => words.join(' ').length * 10;
+      const maxWidth = 100;
+      const text = 'a b c d e f g h i j k l m n o p';
+
+      const result = reduceLines(measureFn, maxWidth, text);
+
+      expect(result).to.be.an('array');
+      expect(result.length).to.be.greaterThan(0);
+    });
+
+    it('should handle quickStringSearch case sensitivity properly', () => {
+      const testList = ['ABC', 'abc', 'AbC', 'aBc'];
+      const search = quickStringSearch(testList);
+
+      const result = search('abc');
+      expect(result.total).to.equal(4);
     });
   });
 });

@@ -7,6 +7,24 @@ const PORT = process.env.PORT || 3001;
 // Enable CORS for all routes
 app.use(cors());
 
+// Get list of books from Gutendex API
+app.get('/api/books', async (_req, res) => {
+  try {
+    console.log('Fetching books from Gutendex...');
+    const response = await fetch('https://gutendex.com/books');
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch books: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching books:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Proxy route to fetch book text files
 app.get('/api/book-text', async (req, res) => {
   const { url } = req.query;
@@ -32,10 +50,15 @@ app.get('/api/book-text', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Only start the server if this file is run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+export default app;

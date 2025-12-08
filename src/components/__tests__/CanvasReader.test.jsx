@@ -2,8 +2,8 @@ import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { expect } from 'chai';
 import React from 'react';
 import sinon from 'sinon';
-import { CanvasReader } from '../src/components/CanvasReader.jsx';
-import { MESSAGES } from '../src/constants/constants.js';
+import { CanvasReader } from '../CanvasReader.jsx';
+import { MESSAGES } from '../../constants/constants.js';
 
 describe('CanvasReader', () => {
   let mockWorker;

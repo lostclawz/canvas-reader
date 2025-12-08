@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { MESSAGES } from '../src/constants/constants.js';
+import { MESSAGES } from '../../constants/constants.js';
 
 describe('reader.worker', () => {
   let mockCtx;
@@ -60,12 +60,12 @@ describe('reader.worker', () => {
 
   describe('Utilities existence', () => {
     it('should have scrollbar utilities', async () => {
-      const mod = await import('../src/utils/scrollbar.js');
+      const mod = await import('../../utils/scrollbar.js');
       expect(mod.setupScrollBar).to.be.a('function');
     });
 
     it('should have reader utilities', async () => {
-      const utils = await import('../src/utils/reader-utils.js');
+      const utils = await import('../../utils/reader-utils.js');
       expect(utils.memo).to.be.a('function');
       expect(utils.reduceLines).to.be.a('function');
       expect(utils.measureWordSet).to.be.a('function');
@@ -136,7 +136,7 @@ describe('reader.worker', () => {
     it('should have worker file at expected location', async () => {
       const { default: fs } = await import('node:fs');
       const { default: path } = await import('node:path');
-      const workerPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../src/workers/reader.worker.js');
+      const workerPath = path.join(path.dirname(new URL(import.meta.url).pathname), '../reader.worker.js');
       expect(fs.existsSync(workerPath)).to.be.true;
     });
   });

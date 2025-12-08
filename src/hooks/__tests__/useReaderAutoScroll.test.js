@@ -1,8 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { MESSAGES } from '../src/constants/constants.js';
-import useReaderAutoScroll from '../src/hooks/useReaderAutoScroll.js';
+import { MESSAGES } from '../../constants/constants.js';
+import useReaderAutoScroll from '../useReaderAutoScroll.js';
 
 describe('useReaderAutoScroll', () => {
   let clock;
