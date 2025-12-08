@@ -1,8 +1,39 @@
+/**
+ * @fileoverview Top-level reader component that combines book selection and canvas rendering.
+ * Provides a complete reading interface with book chooser, search input, and canvas reader.
+ */
+
 import React, { memo, useState } from 'react';
 import BookChooser from './BookChooser.jsx';
 import CanvasReader from './CanvasReader.jsx';
 import { HOST, NODE_SERVER_PORT } from '../constants/constants';
 
+/**
+ * Reader component props.
+ * @typedef {Object} ReaderProps
+ * @property {number} [size=800] - Canvas dimensions (width and height in pixels)
+ * @property {number} [fontSize=15] - Default font size for text rendering
+ */
+
+/**
+ * Main reader component that orchestrates the reading experience.
+ * Combines a BookChooser for selecting books, a search input for finding text,
+ * and a CanvasReader for rendering the book content. Manages state for the
+ * currently selected book and search query.
+ *
+ * The component is memoized to prevent unnecessary re-renders.
+ *
+ * @param {ReaderProps} props - Component configuration props
+ * @returns {React.ReactElement} Complete reader interface with book selection and rendering
+ *
+ * @example
+ * // Default configuration (800x800 canvas, 15px font)
+ * <Reader />
+ *
+ * @example
+ * // Custom size and font
+ * <Reader size={1000} fontSize={18} />
+ */
 const Reader = memo(({ size = 800, fontSize = 15 }) => {
   const [book, setBook] = useState(null);
   const [searchText, setSearchText] = useState('');

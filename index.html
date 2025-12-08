@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Canvas Reader Standalone</title>
     <style>
-      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; }
-      .reader { display: flex; gap: 16px; padding: 16px; }
+      body { margin: 0; font-family: system-ui, -apple-system, sans-serif; overflow-y: hidden; }
+      .reader {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        align-items: flex-start;
+        flex-flow:row;
+      }
       .book-chooser { width: 240px; }
       .list-unstyled { list-style: none; padding: 0; margin: 0; }
       canvas { border: 1px solid #ccc; }

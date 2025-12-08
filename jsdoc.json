@@ -1,0 +1,26 @@
+{
+  "source": {
+    "include": ["src", "server.js"],
+    "includePattern": ".+\\.(js|jsx)$",
+    "excludePattern": "(node_modules|__tests__|.*\\.test\\.(js|jsx))"
+  },
+  "opts": {
+    "destination": "./docs",
+    "recurse": true,
+    "readme": "README.md",
+    "template": "node_modules/docdash"
+  },
+  "plugins": ["plugins/markdown"],
+  "templates": {
+    "cleverLinks": true,
+    "monospaceLinks": false,
+    "default": {
+      "outputSourceFiles": true,
+      "includeDate": false
+    }
+  },
+  "metadata": {
+    "title": "Canvas Reader Documentation",
+    "description": "A high-performance canvas-based text reader with Web Worker rendering"
+  }
+}

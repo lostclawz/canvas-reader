@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Web Worker for canvas-based text rendering.
+ * Handles all text processing, layout, search, and rendering operations off the main thread
+ * to maintain UI responsiveness. Uses offscreen canvas for drawing.
+ */
+
 import { MESSAGES } from '../constants/constants.js';
 import {
   joinLines,
@@ -9,23 +15,47 @@ import {
 } from '../utils/reader-utils.js';
 import { setupScrollBar } from '../utils/scrollbar.js';
 
+/** @constant {boolean} Whether to search by paragraphs (true) or by wrapped lines (false) */
 const SEARCH_PARAGRAPHS = false;
+
+/** Canvas 2D rendering context @type {CanvasRenderingContext2D|null} */
 let ctx;
+/** Canvas width in pixels @type {number} */
 let width;
+/** Canvas height in pixels @type {number} */
 let height;
+/** Device pixel ratio for high-DPI displays @type {number} */
 let ratio;
+/** Current search query text @type {string} */
 let searchText = '';
+/** Memoized search function @type {Function|null} */
 let searcher;
+/** Function to measure text width @type {Function|null} */
 let measureFn;
+/** Line height multiplier @type {number} */
 let lineHeight = 1.1;
+/** Text fill color @type {string} */
 let fillStyle;
+/** Font size in pixels @type {number} */
 let size = 15;
+/** Raw text content from the book file @type {string} */
 let rawContent;
+/** Content split into paragraphs @type {string[]} */
 let paragraphs = [];
+/** Current lines to display (filtered by search if active) @type {string[]} */
 let lines = [];
+/** All lines wrapped to canvas width @type {string[]} */
 let linesRaw = [];
+/** Scrollbar instance @type {Object|null} */
 let scrollBar;
 
+/**
+ * Updates the search filter and rebuilds the visible lines array.
+ * If searching by paragraphs, re-wraps matched paragraphs to lines.
+ * If searching by lines, filters the wrapped lines directly.
+ *
+ * @param {string} txt - Search query text (empty string shows all content)
+ */
 const updateSearch = (txt) => {
   searchText = txt;
 
@@ -52,6 +82,13 @@ const updateSearch = (txt) => {
   }
 };
 
+/**
+ * Renders the visible portion of text to the canvas.
+ * Uses virtual scrolling to only render lines that are currently visible on screen.
+ * Calculates which lines to render based on scroll offset, then draws scrollbar.
+ *
+ * @returns {void}
+ */
 const updateCanvas = () => {
   if (!ctx) return;
   ctx.clearRect(0, 0, width, height);
@@ -77,6 +114,19 @@ const updateCanvas = () => {
   scrollBar.draw();
 };
 
+/**
+ * Updates font-related rendering properties on the canvas context.
+ * Applies font style, size, alignment, colors, and line height from the provided configuration.
+ *
+ * @param {Object} changed - Font property configuration object
+ * @param {string} changed.font - Complete CSS font string (style variant weight size family)
+ * @param {string} changed.baseline - Text baseline (top, middle, bottom, alphabetic)
+ * @param {string} changed.align - Text alignment (left, center, right)
+ * @param {string} changed.fillStyle - Fill color for text
+ * @param {string} changed.strokeStyle - Stroke color for text
+ * @param {number} changed.lineHeight - Line height multiplier
+ * @param {number} changed.size - Font size in pixels
+ */
 const updateFontProps = (changed) => {
   const { font, baseline, align, strokeStyle } = changed;
   lineHeight = changed.lineHeight;
@@ -90,6 +140,14 @@ const updateFontProps = (changed) => {
   ctx.strokeStyle = strokeStyle;
 };
 
+/**
+ * Displays a centered message on the canvas.
+ * Used for loading indicators and status messages.
+ * Saves and restores canvas state to avoid affecting other rendering.
+ *
+ * @param {string} message - Text message to display
+ * @returns {void}
+ */
 const textCenter = (message) => {
   if (!ctx) return;
   ctx.save();
@@ -102,6 +160,15 @@ const textCenter = (message) => {
   ctx.restore();
 };
 
+/**
+ * Processes raw content and rebuilds the searchable data structures.
+ * Depending on SEARCH_PARAGRAPHS setting, either:
+ * - Splits into paragraphs and creates paragraph searcher, OR
+ * - Wraps text to lines and creates line searcher
+ * Creates a memoized search function for performance.
+ *
+ * @returns {void}
+ */
 const rebuildContent = () => {
   if (SEARCH_PARAGRAPHS) {
     paragraphs = splitLines(rawContent);
@@ -112,6 +179,21 @@ const rebuildContent = () => {
   }
 };
 
+/**
+ * Web Worker message handler.
+ * Processes messages from the main thread to control canvas rendering, scrolling,
+ * search, and user interactions. Supported message types:
+ * - INIT: Initialize worker with canvas and configuration
+ * - KILL: Terminate worker (cleanup)
+ * - SCROLL: Apply scroll delta
+ * - UPDATE: Update font properties and re-render
+ * - SEARCH: Update search query and filter content
+ * - MOUSE_DOWN/MOUSE_UP/MOUSE_MOVE: Forward mouse events to scrollbar
+ *
+ * @param {MessageEvent} evt - Message event from main thread
+ * @param {Object} evt.data - Message data object
+ * @param {string} evt.data.type - Message type (from MESSAGES constant)
+ */
 self.onmessage = (evt) => {
   switch (evt.data.type) {
     case MESSAGES.INIT: {

@@ -1,3 +1,9 @@
+/**
+ * @fileoverview Main canvas-based text reader component.
+ * Renders text content on an HTML5 canvas using an offscreen canvas and Web Worker
+ * for high-performance rendering with support for custom fonts, searching, and scrolling.
+ */
+
 import React, { useEffect, useRef } from 'react';
 import { MESSAGES } from '../constants/constants';
 import { stopMouseEvents } from '../utils/reader-utils';
@@ -11,6 +17,15 @@ import {
 
 const DEFAULT_FONTSTYLE = 'normal';
 const getFontStyle = firstTrue(DEFAULT_FONTSTYLE);
+
+/**
+ * Extracts mouse event properties needed for worker communication.
+ * Filters out DOM-specific properties that cannot be transferred to a Web Worker.
+ *
+ * @param {MouseEvent} e - Mouse event object
+ * @returns {Object} Serializable mouse event properties
+ * @private
+ */
 const pickMouseProps = (e) => ({
   altKey: e.altKey,
   button: e.button,
@@ -27,6 +42,71 @@ const pickMouseProps = (e) => ({
   movementY: e.movementY,
 });
 
+/**
+ * CanvasReader component props.
+ * @typedef {Object} CanvasReaderProps
+ * @property {string} [fontFamily='Merriweather'] - CSS font family name
+ * @property {number} [size=10] - Font size in pixels
+ * @property {number} [lineHeight=1.25] - Line height multiplier (1.0 = no spacing, 1.5 = 50% spacing)
+ * @property {string} [fillStyle='black'] - Text fill color (CSS color value)
+ * @property {string} [strokeStyle='black'] - Text stroke color (CSS color value)
+ * @property {string} [weight='normal'] - Font weight (normal, bold, 100-900)
+ * @property {boolean} [italic=false] - Use italic font style
+ * @property {boolean} [oblique=false] - Use oblique font style
+ * @property {string} [variant='normal'] - Font variant (normal, small-caps)
+ * @property {string} [align='left'] - Text alignment (left, center, right)
+ * @property {string} [baseline='top'] - Text baseline (top, middle, bottom, alphabetic)
+ * @property {string} [route='/books'] - URL route to fetch book content from
+ * @property {number} [canvasWidth=1200] - Canvas width in pixels
+ * @property {number} [canvasHeight=800] - Canvas height in pixels
+ * @property {string} [searchText=''] - Text to search for and highlight in the document
+ * @property {boolean} [autoScroll=false] - Enable automatic scrolling
+ * @property {number} [autoScrollTime=60] - Auto-scroll interval in milliseconds
+ * @property {number} [autoScrollAmt=2] - Auto-scroll amount in pixels per interval
+ */
+
+/**
+ * High-performance canvas-based text reader component.
+ * Renders text content using an offscreen canvas and Web Worker to keep the UI thread responsive.
+ * Supports custom fonts, text search, scrolling (manual and automatic), and high-DPI displays.
+ *
+ * The component uses transferControlToOffscreen() to render on a Web Worker, preventing
+ * UI blocking during text layout and rendering operations.
+ *
+ * @param {CanvasReaderProps} props - Component configuration props
+ * @returns {React.ReactElement} Canvas element with text rendering
+ *
+ * @example
+ * // Basic usage
+ * <CanvasReader
+ *   route="/books/mybook.txt"
+ *   canvasWidth={800}
+ *   canvasHeight={600}
+ *   size={16}
+ * />
+ *
+ * @example
+ * // With custom styling and auto-scroll
+ * <CanvasReader
+ *   route="/books/mybook.txt"
+ *   fontFamily="Georgia"
+ *   size={18}
+ *   lineHeight={1.5}
+ *   fillStyle="#333"
+ *   weight="300"
+ *   autoScroll={true}
+ *   autoScrollTime={100}
+ *   autoScrollAmt={3}
+ * />
+ *
+ * @example
+ * // With search functionality
+ * <CanvasReader
+ *   route="/books/mybook.txt"
+ *   searchText="chapter"
+ *   size={14}
+ * />
+ */
 export const CanvasReader = ({
   fontFamily = 'Merriweather',
   size = 10,
