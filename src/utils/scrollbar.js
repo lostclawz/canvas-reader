@@ -220,7 +220,11 @@ export const setupScrollBar = ({
      */
     handleMouseMove(e) {
       if (sb.dragging && e.buttons) {
-        this.applyScrollDelta(e.movementY);
+        // Calculate the ratio between scrollbar track and scrollable content
+        const scrollbarTrack = sb.canvasHeight - sb.height;
+        const scrollableContent = sb.textHeight - sb.canvasHeight;
+        const ratio = scrollableContent / scrollbarTrack;
+        this.applyScrollDelta(e.movementY * ratio);
       }
     },
 
