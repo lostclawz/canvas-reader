@@ -10,7 +10,9 @@ import {
   measureWordSet,
   memo,
   quickStringSearch,
+  quickStringSearchWithNumbers,
   reduceLines,
+  reduceLinesWithNumbers,
   splitLines,
 } from '../utils/reader-utils.js';
 import { setupScrollBar } from '../utils/scrollbar.js';
@@ -42,17 +44,21 @@ let size = 15;
 let rawContent;
 /** Content split into paragraphs @type {string[]} */
 let paragraphs = [];
-/** Current lines to display (filtered by search if active) @type {string[]} */
+/** Current lines to display (filtered by search if active) @type {Array<{text: string, lineNum: number}>} */
 let lines = [];
-/** All lines wrapped to canvas width @type {string[]} */
+/** All lines wrapped to canvas width @type {Array<{text: string, lineNum: number}>} */
 let linesRaw = [];
 /** Scrollbar instance @type {Object|null} */
 let scrollBar;
+/** Width reserved for line numbers on the right side @type {number} */
+const LINE_NUMBER_WIDTH = 60;
+/** Margin between text and line numbers @type {number} */
+const LINE_NUMBER_MARGIN = 10;
 
 /**
  * Updates the search filter and rebuilds the visible lines array.
  * If searching by paragraphs, re-wraps matched paragraphs to lines.
- * If searching by lines, filters the wrapped lines directly.
+ * If searching by lines, filters the wrapped lines directly while preserving line numbers.
  *
  * @param {string} txt - Search query text (empty string shows all content)
  */
@@ -63,14 +69,16 @@ const updateSearch = (txt) => {
     if (searchText) {
       const { results } = joinLines(searcher ? searcher(searchText) : paragraphs);
       linesRaw = results;
-      lines = reduceLines(measureFn, width - 5, linesRaw);
+      lines = reduceLines(measureFn, width - LINE_NUMBER_WIDTH - LINE_NUMBER_MARGIN - 5, linesRaw);
     } else {
       lines = paragraphs;
     }
   } else if (searchText && searcher) {
+    // Get filtered results with line numbers preserved
     const { results } = searcher(searchText);
     lines = results;
   } else {
+    // Show all lines with their numbers
     lines = linesRaw;
   }
 
@@ -81,29 +89,47 @@ const updateSearch = (txt) => {
 };
 
 /**
- * Renders the visible portion of text to the canvas.
+ * Renders the visible portion of text to the canvas with line numbers on the right.
  * Uses virtual scrolling to only render lines that are currently visible on screen.
  * Calculates which lines to render based on scroll offset, then draws scrollbar.
+ * Line numbers are displayed right-aligned on the right side of the canvas.
  *
  * @returns {void}
  */
 const updateCanvas = () => {
   if (!ctx) return;
   ctx.clearRect(0, 0, width, height);
-  let line;
+  let lineObj;
   let idx;
   let yPos;
   const offset = scrollBar.getScrollOffset();
   const firstIdx = Math.floor(-offset / size / lineHeight);
   const lastIdx = Math.ceil(height / (lineHeight * size)) + firstIdx;
 
+  // Calculate the X position for line numbers (left of scrollbar)
+  const lineNumberX = width - LINE_NUMBER_MARGIN - 5;
+  const textMaxWidth = width - LINE_NUMBER_WIDTH - LINE_NUMBER_MARGIN - 5;
+
   for (idx = firstIdx; idx <= lastIdx; idx++) {
-    line = lines[idx];
-    if (line === undefined) break;
+    lineObj = lines[idx];
+    if (lineObj === undefined) break;
     yPos = idx * lineHeight * size + offset;
+
     if (yPos >= -(lineHeight * size) && yPos < height) {
-      ctx.fillText(line, 0, yPos, width - 5);
+      // Draw the main text on the left
+      const lineText = typeof lineObj === 'string' ? lineObj : lineObj.text;
+      ctx.fillText(lineText, 0, yPos, textMaxWidth);
+
+      // Draw the line number on the right (if line has number property)
+      if (lineObj.lineNum !== undefined) {
+        ctx.save();
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#888'; // Slightly gray color for line numbers
+        ctx.fillText(lineObj.lineNum.toString(), lineNumberX, yPos);
+        ctx.restore();
+      }
     }
+
     if (yPos > height) {
       break;
     }
@@ -162,7 +188,7 @@ const textCenter = (message) => {
  * Processes raw content and rebuilds the searchable data structures.
  * Depending on SEARCH_PARAGRAPHS setting, either:
  * - Splits into paragraphs and creates paragraph searcher, OR
- * - Wraps text to lines and creates line searcher
+ * - Wraps text to lines with line numbers and creates line searcher
  * Creates a memoized search function for performance.
  *
  * @returns {void}
@@ -172,8 +198,9 @@ const rebuildContent = () => {
     paragraphs = splitLines(rawContent);
     searcher = memo(quickStringSearch(paragraphs));
   } else {
-    linesRaw = reduceLines(measureFn, width - 5, rawContent);
-    searcher = memo(quickStringSearch(linesRaw));
+    // Use reduceLinesWithNumbers to get line objects with numbers
+    linesRaw = reduceLinesWithNumbers(measureFn, width - LINE_NUMBER_WIDTH - LINE_NUMBER_MARGIN - 5, rawContent);
+    searcher = memo(quickStringSearchWithNumbers(linesRaw));
   }
 };
 

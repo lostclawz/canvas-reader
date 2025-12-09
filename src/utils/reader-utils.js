@@ -97,6 +97,46 @@ export const reduceLines = (measureFn, maxWidth, text) =>
   )(text);
 
 /**
+ * Breaks text into line objects with line numbers.
+ * Similar to reduceLines but returns objects with {text, lineNum} for displaying line numbers.
+ *
+ * @param {Function} measureFn - Function that takes an array of words and returns pixel width
+ * @param {number} maxWidth - Maximum allowed width for each line in pixels
+ * @param {string} text - Input text to be broken into lines
+ * @returns {Array<{text: string, lineNum: number}>} Array of line objects with numbers
+ *
+ * @example
+ * const measure = (words) => words.join(' ').length * 10;
+ * const lines = reduceLinesWithNumbers(measure, 100, 'First\nSecond line');
+ * // Returns: [{text: 'First', lineNum: 1}, {text: 'Second line', lineNum: 2}]
+ */
+export const reduceLinesWithNumbers = (measureFn, maxWidth, text) => {
+  const lines = R.pipe(
+    R.split('\n'),
+    R.map(R.pipe(R.split(' '), R.map(R.trim))),
+    R.chain(
+      R.reduce(
+        (lines, word) =>
+          R.pipe(
+            R.last,
+            R.append(word),
+            measureFn,
+            R.ifElse(
+              R.gt(R.__, maxWidth),
+              () => lines.concat([[word]]),
+              () => R.adjust(-1, R.append(word), lines)
+            )
+          )(lines),
+        [[]]
+      )
+    ),
+    R.map(R.join(' '))
+  )(text);
+
+  return lines.map((text, index) => ({ text, lineNum: index + 1 }));
+};
+
+/**
  * Search result object.
  * @typedef {Object} SearchResult
  * @property {string} searchText - The search term that was used
@@ -159,6 +199,58 @@ export const quickStringSearch =
     return {
       searchText: searchFor,
       results: lineSpacer(results),
+      total,
+    };
+  };
+
+/**
+ * Creates a case-insensitive search function for an array of line objects.
+ * Returns a curried function that performs the search when given a query.
+ * Includes one line before and one line after each match for context.
+ * Preserves line numbers from the original document.
+ *
+ * @param {Array<{text: string, lineNum: number}>} list - Array of line objects to search
+ * @returns {Function} Search function that takes a search term and returns filtered line objects
+ *
+ * @example
+ * const lines = [{text: 'Line 1', lineNum: 1}, {text: 'Hello World', lineNum: 2}];
+ * const search = quickStringSearchWithNumbers(lines);
+ * const results = search('world'); // Returns matching lines with original line numbers
+ */
+export const quickStringSearchWithNumbers =
+  (list) =>
+  (searchFor = '') => {
+    let i;
+    const results = [];
+    let total = 0;
+    if (!searchFor) {
+      return list;
+    }
+    const s = searchFor.toLowerCase();
+    const indicesSet = new Set();
+
+    // First pass: find all matches and collect indices with context
+    for (i = 0; i < list.length; i++) {
+      if (list[i].text.toLowerCase().indexOf(s) >= 0) {
+        total++;
+        // Add the line before (if it exists)
+        if (i > 0) indicesSet.add(i - 1);
+        // Add the matching line
+        indicesSet.add(i);
+        // Add the line after (if it exists)
+        if (i < list.length - 1) indicesSet.add(i + 1);
+      }
+    }
+
+    // Convert to sorted array and build results
+    const sortedIndices = Array.from(indicesSet).sort((a, b) => a - b);
+    for (i = 0; i < sortedIndices.length; i++) {
+      results.push(list[sortedIndices[i]]);
+    }
+
+    return {
+      searchText: searchFor,
+      results,
       total,
     };
   };
