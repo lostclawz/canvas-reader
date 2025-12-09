@@ -6,6 +6,8 @@ A React-based text reader application that renders books on an HTML canvas with 
 
 - **Book Discovery**: Search and browse books from the Gutendex (Project Gutenberg) API
 - **Advanced Text Search**: Search within book content with contextual results (shows matching line plus one line before and after for better context)
+- **Search Term Highlighting**: Search matches are highlighted with yellow highlighting for easy identification
+- **Line Numbers**: Display original line numbers from the text file on the right side of the canvas, even in search results
 - **Canvas Rendering**: High-performance text rendering on HTML canvas with customizable font settings
 - **Web Worker Processing**: Text processing runs off the main thread for smooth UI performance
 - **Auto-scroll**: Configurable automatic scrolling through books
@@ -24,8 +26,12 @@ canvas-reader/
 │   ├── workers/          # Web workers
 │   ├── styles/           # CSS files
 │   └── main.jsx          # Application entry point
-├── tests/                # Test files
-├── server.js             # Express proxy server
+├── server/
+│   ├── routes/           # Express route handlers
+│   │   └── search.js     # Gutendex search API proxy
+│   ├── __tests__/        # Server tests
+│   └── index.js          # Express server configuration
+├── __tests__/            # Global test configuration
 └── index.html            # Entry HTML
 ```
 
@@ -107,27 +113,35 @@ The application uses:
 1. Selected book's text URL is sent to the local Express server
 2. Express server fetches the text and returns it (avoiding CORS)
 3. The text is processed by a Web Worker for optimal performance
-4. Text is rendered on an HTML canvas with a custom scrollbar
-5. Users can search within the book and scroll through the text
+4. Text is wrapped to fit the canvas width while preserving original line numbers
+5. Text is rendered on an HTML canvas with line numbers on the right side
+6. Users can search within the book and scroll through the text
 
 ### In-Book Search Feature
-The search functionality provides contextual results:
+The search functionality provides contextual results with advanced features:
 - When you search for text within a book, results show the matching line **plus one line before and one line after**
+- **Search term highlighting**: All occurrences of the search term are highlighted with a yellow background
+- **Line number preservation**: Original line numbers from the text file are displayed on the right side, even in search results
 - This provides better context for understanding search results
 - Overlapping context windows are automatically deduplicated
 - Search is case-insensitive
 - Results update in real-time as you type
+- Highlighting works with multiple matches per line and supports Unicode characters
 
 ## API Endpoints
 
 The Express server provides the following endpoints:
 
-- `GET /api/books` - Fetch list of books from Gutendex API
-- `GET /api/search?q=<search-query>` - Search for books by title, author, or subject in Gutendex API
-- `GET /api/book-text?url=<encoded-url>` - Proxy book text content (avoids CORS issues)
+- `GET /api/books` - Fetch list of books from Gutendex API (cached)
+- `GET /api/search?q=<search-query>&page=<page-number>` - Search for books by title, author, or subject in Gutendex API
+  - Query parameter `q` (required): Search query string
+  - Query parameter `page` (optional): Page number for pagination
+  - Returns paginated results from the Gutendex API
+  - **Note**: This endpoint is NOT cached to always provide fresh search results
+- `GET /api/book-text?url=<encoded-url>` - Proxy book text content (avoids CORS issues, cached)
 - `GET /health` - Health check endpoint
 
-All endpoints include CORS headers and implement caching for improved performance.
+All endpoints include CORS headers. Book list and text content endpoints implement caching for improved performance, while the search endpoint provides fresh results for each query.
 
 ## Code Quality
 
@@ -139,23 +153,33 @@ The project has comprehensive test coverage including:
 - Component tests (BookChooser, BookSearch, CanvasReader, Reader)
 - Hook tests (custom React hooks like useReaderAutoScroll)
 - Utility function tests (text processing, search, scrollbar, measurements)
+  - Line number preservation (`reduceLinesWithNumbers`)
+  - Search with line numbers (`quickStringSearchWithNumbers`)
+  - Text wrapping and line breaking
+  - Unicode character handling
 - Worker tests (Web Worker message handling)
 - Constants tests
 
 **Backend Tests**:
 - API endpoint tests (using Supertest)
+  - Book search endpoint with query validation
+  - Pagination support
+  - Special character encoding
 - Error handling tests
 - CORS configuration tests
 - Edge case tests
 
-**Total: 193 tests passing**
+**Total: 261 tests passing**
 
 Key test coverage areas:
 - Text search with context lines (before/after matching lines)
+- Line number preservation during text wrapping and searching
 - Canvas text rendering and layout
+- Search term highlighting functionality
 - Scrollbar interaction and positioning
 - Book search and filtering
 - API proxy functionality
+- Unicode character support in search
 
 #### Test Coverage
 

@@ -89,10 +89,69 @@ const updateSearch = (txt) => {
 };
 
 /**
+ * Draws text with highlighted search terms.
+ * Highlights all occurrences of the search term with a yellow background.
+ *
+ * @param {string} text - The text to draw
+ * @param {number} x - X coordinate to start drawing
+ * @param {number} y - Y coordinate to draw
+ * @param {number} maxWidth - Maximum width for the text
+ * @param {string} searchTerm - Term to highlight (case-insensitive)
+ */
+const drawTextWithHighlight = (text, x, y, maxWidth, searchTerm) => {
+  if (!searchTerm) {
+    ctx.fillText(text, x, y, maxWidth);
+    return;
+  }
+
+  const lowerText = text.toLowerCase();
+  const lowerSearch = searchTerm.toLowerCase();
+  let currentX = x;
+  let lastIndex = 0;
+
+  // Find all occurrences of the search term
+  let matchIndex = lowerText.indexOf(lowerSearch);
+
+  while (matchIndex !== -1) {
+    // Draw text before the match
+    if (matchIndex > lastIndex) {
+      const beforeText = text.substring(lastIndex, matchIndex);
+      ctx.fillText(beforeText, currentX, y);
+      currentX += ctx.measureText(beforeText).width;
+    }
+
+    // Draw highlighted match
+    const matchText = text.substring(matchIndex, matchIndex + lowerSearch.length);
+    const matchWidth = ctx.measureText(matchText).width;
+
+    // Draw yellow highlight background FIRST (behind the text)
+    ctx.fillStyle = '#ffeb3b'; // Yellow highlighter color
+    ctx.fillRect(currentX, y - 2, matchWidth, size * 1.1);
+
+    // Set fill style back to text color (use global fillStyle variable)
+    ctx.fillStyle = fillStyle;
+
+    // Draw the matched text on top of the highlight
+    ctx.fillText(matchText, currentX, y);
+    currentX += matchWidth;
+
+    lastIndex = matchIndex + lowerSearch.length;
+    matchIndex = lowerText.indexOf(lowerSearch, lastIndex);
+  }
+
+  // Draw remaining text after the last match
+  if (lastIndex < text.length) {
+    const remainingText = text.substring(lastIndex);
+    ctx.fillText(remainingText, currentX, y);
+  }
+};
+
+/**
  * Renders the visible portion of text to the canvas with line numbers on the right.
  * Uses virtual scrolling to only render lines that are currently visible on screen.
  * Calculates which lines to render based on scroll offset, then draws scrollbar.
  * Line numbers are displayed right-aligned on the right side of the canvas.
+ * Search terms are highlighted with a yellow background.
  *
  * @returns {void}
  */
@@ -116,9 +175,9 @@ const updateCanvas = () => {
     yPos = idx * lineHeight * size + offset;
 
     if (yPos >= -(lineHeight * size) && yPos < height) {
-      // Draw the main text on the left
+      // Draw the main text on the left with search highlighting
       const lineText = typeof lineObj === 'string' ? lineObj : lineObj.text;
-      ctx.fillText(lineText, 0, yPos, textMaxWidth);
+      drawTextWithHighlight(lineText, 0, yPos, textMaxWidth, searchText);
 
       // Draw the line number on the right (if line has number property)
       if (lineObj.lineNum !== undefined) {
