@@ -8,7 +8,7 @@
     "server": "node server/index.js",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "mocha --exit --require esbuild-register --require ./__tests__/mocha-setup.js 'src/**/__tests__/**/*.test.{js,jsx}' 'server/__tests__/**/*.test.js' '__tests__/**/*.test.js'",
+    "test": "mocha --exit --require esbuild-register --require ./src/mocha-setup.js 'src/**/__tests__/**/*.test.{js,jsx}' 'server/__tests__/**/*.test.js'",
     "test:coverage": "c8 npm test",
     "test:coverage:old": "nyc npm test",
     "lint": "biome check .",
